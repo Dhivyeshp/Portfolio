@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Portfolio</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="main-background">
+        <video autoplay loop muted>
+            <source src="assets/videos/background.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="window-controls">
+                <div class="control red"></div>
+                <div class="control yellow"></div>
+                <div class="control green"></div>
+            </div>
+            
+            <div class="categories">
+                <h3>Categories</h3>
+                <div class="nav-item active" data-section="about">
+                    <i class="fas fa-user"></i>
+                    <span>About</span>
+                </div>
+                <div class="nav-item" data-section="skills">
+                    <i class="fas fa-code"></i>
+                    <span>Skills</span>
+                </div>
+                <div class="nav-item" data-section="jobs">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Jobs</span>
+                </div>
+                <div class="nav-item" data-section="projects">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item" data-section="education">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Educations</span>
+                </div>
+            </div>
+            
+            <div class="social-links">
+                <h3>Social Link</h3>
+                <a href="#" class="social-item">
+                    <i class="fab fa-linkedin"></i>
+                    <span>LinkedIn</span>
+                </a>
+                <a href="#" class="social-item">
+                    <i class="fab fa-github"></i>
+                    <span>GitHub</span>
+                </a>
+                <a href="#" class="social-item">
+                    <i class="fab fa-telegram"></i>
+                    <span>Telegram</span>
+                </a>
+                <a href="#" class="social-item">
+                    <i class="fas fa-phone"></i>
+                    <span>Phone</span>
+                </a>
+                <a href="#" class="social-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>Email</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="profile-image">
+                <img src="images/profile.png" alt="Profile Picture">
+            </div>
+            
+            <!-- About Section -->
+            <section id="about" class="content-section active">
+                <div class="hero-card">
+                    <div class="hero-text">
+                        <h1>AmirAli Rashidi</h1>
+                        <p>Innovative Front-End Developer with 4+ years of expertise in building responsive, high-performance web applications using Angular, Vue, and React. Passionate about merging user-centric design with cutting-edge technology to solve complex problems. Proven ability to lead cross-functional teams, mentor junior developers, and deliver scalable solutions aligned with Agile workflows.</p>
+                        <button class="download-btn">Download Resume</button>
+                    </div>
+                    <div class="hero-image">
+                        <img src="images/developer.svg" alt="Developer Illustration">
+                    </div>
+                </div>
+                
+                <h2>My Skills</h2>
+                <div class="skills-container">
+                    <div class="skill-item">
+                        <div class="skill-icon html">
+                            <i class="fab fa-html5"></i>
+                        </div>
+                        <span>Html</span>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon css">
+                            <i class="fab fa-css3-alt"></i>
+                        </div>
+                        <span>CSS/SCSS</span>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon js">
+                            <i class="fab fa-js"></i>
+                        </div>
+                        <span>JavaScript</span>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon ts">
+                            <i class="fab fa-js"></i>
+                        </div>
+                        <span>TypeScript</span>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon angular">
+                            <i class="fab fa-angular"></i>
+                        </div>
+                        <span>Angular</span>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon react">
+                            <i class="fab fa-react"></i>
+                        </div>
+                        <span>React</span>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon vue">
+                            <i class="fab fa-vuejs"></i>
+                        </div>
+                        <span>Vue</span>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon git">
+                            <i class="fab fa-git-alt"></i>
+                        </div>
+                        <span>Git</span>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon linux">
+                            <i class="fab fa-linux"></i>
+                        </div>
+                        <span>Linux</span>
+                    </div>
+                </div>
+                
+                <h2>My Jobs</h2>
+                <div class="jobs-container">
+                    <div class="job-card">
+                        <div class="job-header">
+                            <div class="company-logo">
+                                <img src="images/company1.png" alt="i4Twins">
+                            </div>
+                            <div class="job-title">
+                                <h3>i4Twins</h3>
+                                <span class="job-date">Apr 2024 - Present</span>
+                            </div>
+                        </div>
+                        <div class="job-description">
+                            <p>i4Twins is an IIoT No-Code Platform for industry 4.0 solutions, this platform helps non-programmer users to design customizable dashboards.</p>
+                            <ul>
+                                <li>Built core platform features including an application builder, report engine, and rule engine, enabling non-technical users to design custom dashboards and automate workflows.</li>
+                                <li>Developed dynamic data visualization tools (charts, graphs, heatmaps) to simplify analysis of industrial datasets, improving decision-making.</li>
+                                <li>Engineered drag-and-drop interfaces, reducing user onboarding time and increasing platform adoption.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="job-card">
+                        <div class="job-header">
+                            <div class="company-logo">
+                                <img src="images/company2.png" alt="FaraaBeen">
+                            </div>
+                            <div class="job-title">
+                                <h3>FaraaBeen</h3>
+                                <span class="job-date">Apr 2023 - Apr 2024 · 1 yr 1 mo</span>
+                            </div>
+                        </div>
+                        <div class="job-description">
+                            <p>Development of Communication Networks and Industrial Smart Solutions.</p>
+                            <ul>
+                                <li>Optimized front-end performance by 50%, enabling real-time monitoring of 1,500+ communication base stations.</li>
+                                <li>Integrated Highcharts and Leaflet.js for real-time KPI tracking and geolocation mapping, reducing client-reported issues by 40%.</li>
+                                <li>Delivered a customizable and user-friendly interface aligned with client specifications and responsive UI/UX for monitoring communication base stations.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="job-card">
+                        <div class="job-header">
+                            <div class="company-logo">
+                                <img src="images/company3.png" alt="HyvaTech">
+                            </div>
+                            <div class="job-title">
+                                <h3>HyvaTech</h3>
+                                <span class="job-date">Mar 2021 – Apr 2023 · 2 yr 2 mo</span>
+                            </div>
+                        </div>
+                        <div class="job-description">
+                            <ul>
+                                <li>Mentored 5 junior developers, advancing their skills in Angular and SDLC.</li>
+                                <li>Developed a comprehensive employment and judicial application.</li>
+                                <li>Ensured code quality through rigorous practices including code reviews, pair programming, and knowledge sharing.</li>
+                                <li>Used SCSS to add a theme to change colors based on customer preferences.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <h2>My Projects</h2>
+                <div class="projects-container">
+                    <div class="project-card">
+                        <h3>Alpha Medical Assistant</h3>
+                        <p>Developed a smart medical assistant platform for doctors and students, focusing on diagnostic support and X-ray image processing. Redesigned default PrimeNG components to align with brand guidelines, enhancing visual consistency and user satisfaction. Integrated PrimeNG's Organization Chart to visualize hierarchical medical workflows. Built a fully responsive Angular-based interface, improving mobile engagement and establishing a seamless experience across devices.</p>
+                        <a href="#" class="project-link">Open</a>
+                    </div>
+                    
+                    <div class="project-card">
+                        <h3>RoadTrust</h3>
+                        <p>Designed and developed a cryptocurrency staking platform enabling users to manage high-yield crypto investments. Leveraged Angular and PrimeNG to create an intuitive interface for staking and asset management, resulting in a 25% increase in user registrations within the first quarter. Implemented responsive design principles to ensure cross-device compatibility, reducing mobile bounce rates by 15%. Balanced aesthetic appeal with functional usability to drive investor retention and platform scalability.</p>
+                        <a href="#" class="project-link">Open</a>
+                    </div>
+                </div>
+                
+                <h2>My Education</h2>
+                <div class="education-container">
+                    <div class="education-card">
+                        <div class="education-logo">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="education-details">
+                            <h3>Bachelor of Computer Engineering</h3>
+                            <p>Islamic Azad University of Yazd</p>
+                            <span class="education-date">2022 Oct – present</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <script src="js/script.js"></script>
+</body>
+</html>

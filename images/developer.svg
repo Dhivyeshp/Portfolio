@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <style>
+    .desk { fill: #34495e; }
+    .monitor { fill: #2c3e50; stroke: #95a5a6; stroke-width: 2; }
+    .screen { fill: #3498db; }
+    .keyboard { fill: #7f8c8d; }
+    .person { fill: #e74c3c; }
+    .head { fill: #f39c12; }
+    .hair { fill: #2c3e50; }
+    .shirt { fill: #3498db; }
+    .pants { fill: #2c3e50; }
+    .plant { fill: #27ae60; }
+    .pot { fill: #e67e22; }
+    .code { fill: #ecf0f1; font-family: monospace; font-size: 8px; }
+  </style>
+  
+  <!-- Desk -->
+  <rect class="desk" x="50" y="180" width="300" height="20" rx="2" />
+  <rect class="desk" x="60" y="200" width="280" height="10" />
+  
+  <!-- Monitor -->
+  <rect class="monitor" x="150" y="100" width="120" height="80" rx="4" />
+  <rect class="screen" x="155" y="105" width="110" height="70" rx="2" />
+  <rect class="monitor" x="200" y="180" width="20" height="10" />
+  <rect class="monitor" x="190" y="190" width="40" height="5" />
+  
+  <!-- Keyboard -->
+  <rect class="keyboard" x="170" y="160" width="80" height="15" rx="2" />
+  
+  <!-- Person -->
+  <circle class="head" cx="120" cy="130" r="15" />
+  <path class="hair" d="M105,125 Q120,110 135,125" />
+  <rect class="shirt" x="110" y="145" width="20" height="30" />
+  <rect class="pants" x="110" y="175" width="20" height="20" />
+  
+  <!-- Plant -->
+  <rect class="pot" x="300" y="150" width="20" height="30" rx="2" />
+  <ellipse class="plant" cx="310" cy="140" rx="15" ry="10" />
+  <ellipse class="plant" cx="310" cy="130" rx="12" ry="8" />
+  <ellipse class="plant" cx="310" cy="120" rx="8" ry="6" />
+  
+  <!-- Code on screen -->
+  <text class="code" x="160" y="115">function hello() {</text>
+  <text class="code" x="160" y="125">  return "world";</text>
+  <text class="code" x="160" y="135">}</text>
+  <text class="code" x="160" y="155">const css = "awesome";</text>
+</svg>
