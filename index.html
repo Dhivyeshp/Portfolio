@@ -6,243 +6,445 @@
     <title>Personal Portfolio</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    <div class="main-background">
-        <video autoplay loop muted>
-            <source src="assets/videos/background.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-    </div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/geist-mono@5.0.1/index.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/devicon@2.15.1/devicon.min.css">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        #skills, #jobs, #projects, #education {
+            padding-top: 60px; 
+            scroll-margin-top: 20px; 
+        }
+    </style>
+    </head>
+        <body>
+            <div class="main-background"></div>
+            <div class="shiny-background">
+              <div class="shiny-effect"></div>
+            </div>
+          <div class="shiny">
+            <div class="container">
+                <div class="sidebar">
+                    
+                 
+                    <div class="categories">
+                        <div class="nav-item active" data-section="about">
+                            <i class="fas fa-user"></i>
+                            <span>About</span>
+                        </div>
+                        <div class="nav-item" data-section="skills">
+                            <i class="fas fa-code"></i>
+                            <span>Skills</span>
+                        </div>
+                        <div class="nav-item" data-section="jobs">
+                            <i class="fas fa-briefcase"></i>
+                            <span>Jobs</span>
+                        </div>
+                        <div class="nav-item" data-section="projects">
+                            <i class="fas fa-project-diagram"></i>
+                            <span>Projects</span>
+                        </div>
+                        <div class="nav-item" data-section="education">
+                            <i class="fas fa-graduation-cap"></i>
+                            <span>Educations</span>
+                        </div>
+                    </div>
 
-    <div class="container">
-        <div class="sidebar">
-            <div class="window-controls">
-                <div class="control red"></div>
-                <div class="control yellow"></div>
-                <div class="control green"></div>
-            </div>
-            
-            <div class="categories">
-                <h3>Categories</h3>
-                <div class="nav-item active" data-section="about">
-                    <i class="fas fa-user"></i>
-                    <span>About</span>
+                    
+                    
+                    
+
                 </div>
-                <div class="nav-item" data-section="skills">
-                    <i class="fas fa-code"></i>
-                    <span>Skills</span>
+                
+                <div class="main-content">
+                    <div class="profile-image">
+                    </div>
+                    
+
+                    <div class="hero-left">
+                        
+                        
+
+                        <div class="profile-info">
+                            <h3 class="profile-name">Dhivyesh Prithiviraj</h3>
+                            <p class="profile-title">Computer Engineering @ University of Texas at Dallas</p>
+                            <div class="profile-tags">
+                                <p class="profile-location"><i class="fas fa-map-marker-alt"></i> Dallas, Texas</p>
+                                <p class="profile-location"><i class="fas fa-language"></i> English</p>
+                            </div>
+                            <p>Versatile Software and App Developer with a strong foundation in machine learning and engineering-focused applications. Experienced in building intelligent systems using Python, TensorFlow, and PyTorch, and developing responsive web and iOS applications. Skilled at integrating data-driven insights into scalable, real-world software solutions.
+
+                            </p>
+                            
+                            <div class="social-links">
+                                <a href="https://www.linkedin.com/in/dhivyeshprithiviraj/" class="social-item">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                                <a href="https://github.com/Dhivyeshp" class="social-item">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                               
+                                <a href="mailto:dhivyeshrathi@gmail.com" class="social-item">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <!-- About Section -->
+                    <section id="about" class="content-section active">
+                        <div class="hero-card">
+                            
+                            
+                            <div class="hero-text">
+                               
+                                <p>I started coding in high school by building chatbots and automation scripts, 
+                                    quickly realizing how powerful software could be in solving real-world 
+                                    problems.</p>
+                                <br>
+                                    
+                                <p>Now, I'm a Computer Engineering student at UT Dallas, where I've 
+                                    developed projects ranging from a calorie-detection system using Azure and 
+                                    computer vision to a full-stack seat-swapping app integrated with the American 
+                                    Airlines API.</p>
+                                <br>
+
+                                <p>Through research at the Reliability and Design Automation Lab, 
+                                    I apply machine learning and physics-based modeling to improve predictions in 
+                                    battery health and fluid dynamics. I'm also a HackUTD logistics 
+                                    coordinator and work as a freelance graphic designer.</p>
+                                <br>
+
+                                    <a href="assets/Dhivyesh_Resume.pdf" download>
+                                    <button class="download-btn">Download Resume</button>
+                                </a>
+
+                                <div class="skills-container">
+                                    <h2 id="skills">Skills</h2>
+                                    <div class="skills-grid">
+                                        <h3>Programming Languages</h3>
+                                        <div class="skill-item">
+                                            <div class="skill-icon html">
+                                                <i class="fab fa-html5"></i>
+                                            </div>
+                                            <span>HTML</span>
+                                        </div>
+                                        <div class="skill-item">
+                                            <div class="skill-icon css">
+                                                <i class="fab fa-css3-alt"></i>
+                                            </div>
+                                            <span>CSS</span>
+                                        </div>
+                                        <div class="skill-item">
+                                            <div class="skill-icon java">
+                                                <i class="fab fa-java"></i>
+                                            </div>
+                                            <span>Java</span>
+                                        </div>
+                                        <div class="skill-item">
+                                            <div class="skill-icon react">
+                                                <i class="fab fa-react"></i>
+                                            </div>
+                                            <span>React</span>
+                                        </div>
+                                        <div class="skill-item">
+                                            <div class="skill-icon js">
+                                                <i class="fab fa-js"></i>
+                                            </div>
+                                            <span>JavaScript</span>
+                                        </div>
+                                        <div class="skill-item">
+                                            <div class="skill-icon next">
+                                                <i class="fab fa-react"></i>
+                                            </div>
+                                            <span>NextJS</span>
+                                        </div>
+                                        <div class="skill-item">
+                                            <div class="skill-icon python">
+                                                <i class="fab fa-python"></i>
+                                            </div>
+                                            <span>Python</span>
+                                        </div>
+                                        <div class="skill-item">
+                                            <div class="skill-icon cpp">
+                                                <i class="fas fa-code"></i>
+                                            </div>
+                                            <span>C++</span>
+                                        </div>
+                                        <div class="skill-item">
+                                            <div class="skill-icon node">
+                                                <i class="fab fa-node-js"></i>
+                                            </div>
+                                            <span>Node.js</span>
+                                        </div>
+                                        <div class="skill-item">
+                                            <div class="skill-icon react-native">
+                                                <i class="fab fa-react"></i>
+                                            </div>
+                                            <span>React Native</span>
+                                        </div>
+                                    </div>
+                                    <div class="skills-grid">
+                                        <h3>Tools and Frameworks</h3>
+                                        <div class="skill-item">
+                                            <div class="skill-icon git">
+                                                <i class="devicon-git-plain"></i>
+                                            </div>
+                                            <span>Git</span>
+                                        </div>
+                                        <div class="skill-item">
+                                            <div class="skill-icon firebase">
+                                                <i class="devicon-firebase-plain"></i>
+                                            </div>
+                                            <span>Firebase</span>
+                                        </div>
+                                        <div class="skill-item">
+                                            <div class="skill-icon numpy">
+                                                <i class="devicon-numpy-original"></i>
+                                            </div>
+                                            <span>NumPy</span>
+                                        </div>
+                                        <div class="skill-item">
+                                            <div class="skill-icon pandas">
+                                                <i class="devicon-pandas-original"></i>
+                                            </div>
+                                            <span>Pandas</span>
+                                        </div>
+                                        <div class="skill-item">
+                                            <div class="skill-icon photoshop">
+                                                <i class="devicon-photoshop-plain"></i>
+                                            </div>
+                                            <span>Photoshop</span>
+                                        </div>
+                                        <div class="skill-item">
+                                            <div class="skill-icon after-effects">
+                                                <i class="devicon-aftereffects-plain"></i>
+                                            </div>
+                                            <span>After Effects</span>
+                                        </div>
+                                        <div class="skill-item">
+                                            <div class="skill-icon expo">
+                                                <i class="fas fa-mobile-alt"></i>
+                                            </div>
+                                            <span>Expo Go</span>
+                                        </div>
+                                        <div class="skill-item">
+                                            <div class="skill-icon figma">
+                                                <i class="fab fa-figma"></i>
+                                            </div>
+                                            <span>Figma</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <h2 id="jobs">Experience</h2>
+                                <div class="jobs-container">
+                                    <div class="job-card">
+                                        <div class="job-header">
+                                            <div class="company-logo">
+                                                <img src="images/hackutd.png" alt="HackUTD">
+                                            </div>
+                                            <div class="job-title">
+                                                <h3>Logistics Coordinator</h3>
+                                                <span class="job-date">January 2025 – Present</span>
+                                            </div>
+                                        </div>
+                                        <div class="job-description">
+                                            <p>HackUTD | Dallas, TX</p>
+                                            <ul>
+                                                <li>Coordinated logistics, food, and participant experience for HackUTD, North America's largest hackathon.</li>
+                                                <li>Liaised with sponsors, vendors, and volunteers to ensure smooth operations and timely deliveries.</li>
+                                                <li>Volunteered at local hackathons, including HackAxxess and WeHack, assisting with event organization.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div class="job-card">
+                                        <div class="job-header">
+                                            <div class="company-logo">
+                                                <img src="images/sae.png" alt="SAE">
+                                            </div>
+                                            <div class="job-title">
+                                                <h3>Design Engineer, Powertrain</h3>
+                                                <span class="job-date">August 2024 – Present</span>
+                                            </div>
+                                        </div>
+                                        <div class="job-description">
+                                            <p>UTD Society of Automotive Engineers | Dallas, TX</p>
+                                            <ul>
+                                                <li>Conducted advanced CAD modeling and Finite Element Analysis (FEA) in SolidWorks to identify and mitigate 10+ potential failure points in powertrain components.</li>
+                                                <li>Optimized thermal management and enhanced cooling efficiency by designing and refining a custom radiator fan.</li>
+                                                <li>Developed and presented a prototype oil catch can design, evaluating its theoretical efficiency and impact on engine performance.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="job-card">
+                                        <div class="job-header">
+                                            <div class="company-logo">
+                                                <img src="images/accenture.png" alt="Accenture">
+                                            </div>
+                                            <div class="job-title">
+                                                <h3>Data Analytics Intern</h3>
+                                                <span class="job-date">January 2024 – June 2024</span>
+                                            </div>
+                                        </div>
+                                        <div class="job-description">
+                                            <p>Accenture | Remote</p>
+                                            <ul>
+                                                <li>Analyzed a Social Buzz dataset with 10,000+ daily entries, using NumPy and Pandas to clean data, identify trends, and rank the top 5 content categories based on engagement.</li>
+                                                <li>Synthesized complex datasets and presented insights using advanced data visualization techniques, enabling Accenture to drive 15+ strategic decisions based on 20+ key project insights.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="job-card">
+                                        <div class="job-header">
+                                            <div class="company-logo">
+                                                <img src="images/mcf.jpg" alt="Mark Cuban Foundation">
+                                            </div>
+                                            <div class="job-title">
+                                                <h3>Communications/Marketing Chairperson & Student Ambassador</h3>
+                                                <span class="job-date">October 2022 – November 2023</span>
+                                            </div>
+                                        </div>
+                                        <div class="job-description">
+                                            <p>Mark Cuban Foundation | Dallas, TX</p>
+                                            <ul>
+                                                <li>Designed and implemented a tool utilizing Microsoft Azure and advanced Computer Vision techniques to accurately detect calorie content in food items through image recognition.</li>
+                                                <li>Led as one of 15 ambassadors to shape AI camp curricula, provide strategic feedback, and mentor 1500+ students through hands-on AI bootcamps.</li>
+                                                <li>Spearheaded marketing initiatives, creating targeted campaigns and engaging content to increase awareness and participation in AI programs, resulting in a 20% growth in student enrollment.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+
+                                
+                        
+                        <h2 id="projects">Projects & Research</h2>
+                        <div class="projects-container">
+                            <div class="project-card">
+                                <h3>Vertera</h3>
+                                <p>March 2024</p>
+                                <div class="project-images">
+                                    <img src="images/vertera1.png" alt="Vertera Dashboard" onclick="openModal(this)">
+                                    <img src="images/vertera2.png" alt="Vertera Analytics" onclick="openModal(this)">
+                                </div>
+                                <ul>
+                                    <li>Developed a comprehensive data analytics platform for small businesses using React, Node.js, and MongoDB.</li>
+                                    <li>Implemented real-time data visualization with D3.js and Chart.js for interactive business insights.</li>
+                                    <li>Created a custom dashboard with drag-and-drop functionality for personalized data views.</li>
+                                    <li>Integrated machine learning algorithms for predictive analytics and trend forecasting.</li>
+                                </ul>
+
+                                <a href="#" class="github-link">
+                                    <i class="fab fa-github"></i>
+                                    <span>GitHub</span>
+                                </a>
+
+                                <div class="project-tech">
+                                    <span class="tech-tag">React</span>
+                                    <span class="tech-tag">Node.js</span>
+                                    <span class="tech-tag">MongoDB</span>
+                                    <span class="tech-tag">D3.js</span>
+                                    <span class="tech-tag">Machine Learning</span>
+                                </div>
+                            </div>
+                            
+                            <div class="project-card">
+                                <h3>Undergraduate Researcher — Reliability and Design Automation Lab</h3>
+                                <p>University of Texas at Dallas | Dallas, TX | January 2025 – Present</p>
+                                
+                                <div class="project-images">
+                                    <img src="images/plot.png" alt="Battery Life Prediction Model" onclick="openModal(this)">
+                                    <img src="images/plot2.png" alt="Model Performance Metrics" onclick="openModal(this)">
+                                </div>
+                                
+                                <p>Developed Physics-Informed Machine Learning (PIML) models for 
+                                    battery life prediction using Python, Scikit-learn, TensorFlow, 
+                                    and PyTorch. Engineered features from the BatteryLife dataset, 
+                                    applied standard scaling, and trained multivariate linear 
+                                    regression models. Evaluated models with MSE, MAE, R², and 
+                                    MAPE metrics, validated robustness using 5-fold cross-validation, 
+                                    and performed residual and relative error analysis. Generated 
+                                    synthetic data for benchmarking and integrated Conformal Prediction 
+                                    frameworks to quantify model uncertainty.
+                                </p>
+
+                                <a href="assets/research_paper.pdf" class="paper-btn" target="_blank">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span>View Paper</span>
+                                </a>
+                                
+                            <div class="project-tech">
+                                <span class="tech-tag">Python</span>
+                                <span class="tech-tag">TensorFlow</span>
+                                <span class="tech-tag">PyTorch</span>
+                                <span class="tech-tag">Machine Learning</span>
+                            </div>
+                            
+                        </div>
+
+                        <div class="project-card">
+                            <h3>SeatSwap</h3>
+                            <p>November 2024</p>
+                            <div class="project-images">
+                                <img src="images/seatswap1.png" alt="SeatSwap Dashboard" onclick="openModal(this)">
+                            </div>
+                            <ul>
+                                <li>Collaborated with a team of 3 on developing a flight seat-swapping app to enable real-time seat availability.</li>
+                                <li>Integrated American Airlines API with RESTful services using Express for seamless seat swaps.</li>
+                                <li>Designed an MVP with an intuitive UI, secure JWT authentication, seat preference filters, and a request management system, deployed on AWS.</li>
+                            </ul>
+
+                            <a href="https://github.com/SooryaS2/TamuHackApp" class="paper-btn" target="_blank">
+                                <i class="fab fa-github"></i>
+                                <span>View on GitHub</span>
+                            </a>
+
+                            <div class="project-tech">
+                                <span class="tech-tag">React</span>
+                                <span class="tech-tag">Node.js</span>
+                                <span class="tech-tag">TypeScript</span>
+                                <span class="tech-tag">Express</span>
+                                <span class="tech-tag">AWS</span>
+                            </div>
+                           
+                        </div>
+                    </div>
+                    
+                    <h2 id="education">My Education</h2>
+                    <div class="education-container">
+                        <div class="education-card">
+                            <div class="education-logo">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <div class="education-details">
+                                <h3>Bachelor of Computer Engineering</h3>
+                                <p>University of Texas at Dallas</p>
+                                <span class="education-date">2024 August – present</span>
+                            </div>
+                        </div>
+                    </div>
+                              
+                        </div>
+                        
+                        
+                    </div>
+                    
+                   
                 </div>
-                <div class="nav-item" data-section="jobs">
-                    <i class="fas fa-briefcase"></i>
-                    <span>Jobs</span>
-                </div>
-                <div class="nav-item" data-section="projects">
-                    <i class="fas fa-project-diagram"></i>
-                    <span>Projects</span>
-                </div>
-                <div class="nav-item" data-section="education">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>Educations</span>
-                </div>
-            </div>
-            
-            <div class="social-links">
-                <h3>Social Link</h3>
-                <a href="#" class="social-item">
-                    <i class="fab fa-linkedin"></i>
-                    <span>LinkedIn</span>
-                </a>
-                <a href="#" class="social-item">
-                    <i class="fab fa-github"></i>
-                    <span>GitHub</span>
-                </a>
-                <a href="#" class="social-item">
-                    <i class="fab fa-telegram"></i>
-                    <span>Telegram</span>
-                </a>
-                <a href="#" class="social-item">
-                    <i class="fas fa-phone"></i>
-                    <span>Phone</span>
-                </a>
-                <a href="#" class="social-item">
-                    <i class="fas fa-envelope"></i>
-                    <span>Email</span>
-                </a>
+                
+               
             </div>
         </div>
-        
-        <div class="main-content">
-            <div class="profile-image">
-                <img src="images/profile.png" alt="Profile Picture">
-            </div>
-            
-            <!-- About Section -->
-            <section id="about" class="content-section active">
-                <div class="hero-card">
-                    <div class="hero-text">
-                        <h1>AmirAli Rashidi</h1>
-                        <p>Innovative Front-End Developer with 4+ years of expertise in building responsive, high-performance web applications using Angular, Vue, and React. Passionate about merging user-centric design with cutting-edge technology to solve complex problems. Proven ability to lead cross-functional teams, mentor junior developers, and deliver scalable solutions aligned with Agile workflows.</p>
-                        <button class="download-btn">Download Resume</button>
-                    </div>
-                    <div class="hero-image">
-                        <img src="images/developer.svg" alt="Developer Illustration">
-                    </div>
-                </div>
-                
-                <h2>My Skills</h2>
-                <div class="skills-container">
-                    <div class="skill-item">
-                        <div class="skill-icon html">
-                            <i class="fab fa-html5"></i>
-                        </div>
-                        <span>Html</span>
-                    </div>
-                    <div class="skill-item">
-                        <div class="skill-icon css">
-                            <i class="fab fa-css3-alt"></i>
-                        </div>
-                        <span>CSS/SCSS</span>
-                    </div>
-                    <div class="skill-item">
-                        <div class="skill-icon js">
-                            <i class="fab fa-js"></i>
-                        </div>
-                        <span>JavaScript</span>
-                    </div>
-                    <div class="skill-item">
-                        <div class="skill-icon ts">
-                            <i class="fab fa-js"></i>
-                        </div>
-                        <span>TypeScript</span>
-                    </div>
-                    <div class="skill-item">
-                        <div class="skill-icon angular">
-                            <i class="fab fa-angular"></i>
-                        </div>
-                        <span>Angular</span>
-                    </div>
-                    <div class="skill-item">
-                        <div class="skill-icon react">
-                            <i class="fab fa-react"></i>
-                        </div>
-                        <span>React</span>
-                    </div>
-                    <div class="skill-item">
-                        <div class="skill-icon vue">
-                            <i class="fab fa-vuejs"></i>
-                        </div>
-                        <span>Vue</span>
-                    </div>
-                    <div class="skill-item">
-                        <div class="skill-icon git">
-                            <i class="fab fa-git-alt"></i>
-                        </div>
-                        <span>Git</span>
-                    </div>
-                    <div class="skill-item">
-                        <div class="skill-icon linux">
-                            <i class="fab fa-linux"></i>
-                        </div>
-                        <span>Linux</span>
-                    </div>
-                </div>
-                
-                <h2>My Jobs</h2>
-                <div class="jobs-container">
-                    <div class="job-card">
-                        <div class="job-header">
-                            <div class="company-logo">
-                                <img src="images/company1.png" alt="i4Twins">
-                            </div>
-                            <div class="job-title">
-                                <h3>i4Twins</h3>
-                                <span class="job-date">Apr 2024 - Present</span>
-                            </div>
-                        </div>
-                        <div class="job-description">
-                            <p>i4Twins is an IIoT No-Code Platform for industry 4.0 solutions, this platform helps non-programmer users to design customizable dashboards.</p>
-                            <ul>
-                                <li>Built core platform features including an application builder, report engine, and rule engine, enabling non-technical users to design custom dashboards and automate workflows.</li>
-                                <li>Developed dynamic data visualization tools (charts, graphs, heatmaps) to simplify analysis of industrial datasets, improving decision-making.</li>
-                                <li>Engineered drag-and-drop interfaces, reducing user onboarding time and increasing platform adoption.</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="job-card">
-                        <div class="job-header">
-                            <div class="company-logo">
-                                <img src="images/company2.png" alt="FaraaBeen">
-                            </div>
-                            <div class="job-title">
-                                <h3>FaraaBeen</h3>
-                                <span class="job-date">Apr 2023 - Apr 2024 · 1 yr 1 mo</span>
-                            </div>
-                        </div>
-                        <div class="job-description">
-                            <p>Development of Communication Networks and Industrial Smart Solutions.</p>
-                            <ul>
-                                <li>Optimized front-end performance by 50%, enabling real-time monitoring of 1,500+ communication base stations.</li>
-                                <li>Integrated Highcharts and Leaflet.js for real-time KPI tracking and geolocation mapping, reducing client-reported issues by 40%.</li>
-                                <li>Delivered a customizable and user-friendly interface aligned with client specifications and responsive UI/UX for monitoring communication base stations.</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="job-card">
-                        <div class="job-header">
-                            <div class="company-logo">
-                                <img src="images/company3.png" alt="HyvaTech">
-                            </div>
-                            <div class="job-title">
-                                <h3>HyvaTech</h3>
-                                <span class="job-date">Mar 2021 – Apr 2023 · 2 yr 2 mo</span>
-                            </div>
-                        </div>
-                        <div class="job-description">
-                            <ul>
-                                <li>Mentored 5 junior developers, advancing their skills in Angular and SDLC.</li>
-                                <li>Developed a comprehensive employment and judicial application.</li>
-                                <li>Ensured code quality through rigorous practices including code reviews, pair programming, and knowledge sharing.</li>
-                                <li>Used SCSS to add a theme to change colors based on customer preferences.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <h2>My Projects</h2>
-                <div class="projects-container">
-                    <div class="project-card">
-                        <h3>Alpha Medical Assistant</h3>
-                        <p>Developed a smart medical assistant platform for doctors and students, focusing on diagnostic support and X-ray image processing. Redesigned default PrimeNG components to align with brand guidelines, enhancing visual consistency and user satisfaction. Integrated PrimeNG's Organization Chart to visualize hierarchical medical workflows. Built a fully responsive Angular-based interface, improving mobile engagement and establishing a seamless experience across devices.</p>
-                        <a href="#" class="project-link">Open</a>
-                    </div>
-                    
-                    <div class="project-card">
-                        <h3>RoadTrust</h3>
-                        <p>Designed and developed a cryptocurrency staking platform enabling users to manage high-yield crypto investments. Leveraged Angular and PrimeNG to create an intuitive interface for staking and asset management, resulting in a 25% increase in user registrations within the first quarter. Implemented responsive design principles to ensure cross-device compatibility, reducing mobile bounce rates by 15%. Balanced aesthetic appeal with functional usability to drive investor retention and platform scalability.</p>
-                        <a href="#" class="project-link">Open</a>
-                    </div>
-                </div>
-                
-                <h2>My Education</h2>
-                <div class="education-container">
-                    <div class="education-card">
-                        <div class="education-logo">
-                            <i class="fas fa-university"></i>
-                        </div>
-                        <div class="education-details">
-                            <h3>Bachelor of Computer Engineering</h3>
-                            <p>Islamic Azad University of Yazd</p>
-                            <span class="education-date">2022 Oct – present</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
+        <div id="imageModal" class="modal">
+            <span class="close">&times;</span>
+            <img class="modal-content" id="modalImage">
         </div>
-    </div>
-    
-    <script src="js/script.js"></script>
-</body>
+        <script src="js/script.js"></script>      
+    </body>
 </html>

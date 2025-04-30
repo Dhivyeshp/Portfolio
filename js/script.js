@@ -1,106 +1,206 @@
-// Navigation functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Get all navigation items
-    const navItems = document.querySelectorAll('.nav-item');
+    // Scroll to top on page load/refresh
+    window.scrollTo(0, 0);
     
-    // Add click event to each navigation item
+    // Background shiny effect
+    const shinyEffect = document.querySelector(".shiny-effect");
+    const shinyButton = document.querySelector(".shiny");
+    
+    // Mouse movement effects
+    
+    // Shiny button effect
+    if (shinyButton) {
+        shinyButton.addEventListener("mousemove", (e) => {
+            const { x, y } = shinyButton.getBoundingClientRect();
+            shinyButton.style.setProperty("--x", e.clientX - x);
+            shinyButton.style.setProperty("--y", e.clientY - y);
+        });
+    }
+    
+    // Navigation functionality
+    const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => {
         item.addEventListener('click', function() {
-            // Remove active class from all navigation items
             navItems.forEach(nav => nav.classList.remove('active'));
-            
-            // Add active class to clicked item
             this.classList.add('active');
             
-            // Get the section to show
             const sectionId = this.getAttribute('data-section');
-            
-            // Hide all content sections
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Show the selected section
-            document.getElementById(sectionId).classList.add('active');
-            
-            // Scroll to the top of the section
             document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
         });
     });
     
-    // Resume download button functionality
-    const downloadBtn = document.querySelector('.download-btn');
-    if (downloadBtn) {
-        downloadBtn.addEventListener('click', function() {
-            // In a real scenario, this would link to your resume file
-            alert('Resume download functionality would be implemented here.');
-            // Example: window.open('path/to/your/resume.pdf', '_blank');
-        });
-    }
+    const elementsWithSpecificStyle = document.querySelectorAll('.hero-card, .job-card, .project-card, .education-card');
     
-    // Project links functionality
-    const projectLinks = document.querySelectorAll('.project-link');
-    projectLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            if (this.getAttribute('href') === '#') {
-                e.preventDefault();
-                alert('This would link to your project.');
-            }
-        });
-    });
-    
-    // Social links functionality
-    const socialLinks = document.querySelectorAll('.social-item');
-    socialLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            if (this.getAttribute('href') === '#') {
-                e.preventDefault();
-                const socialType = this.querySelector('span').textContent;
-                alert(`This would link to your ${socialType} profile.`);
-            }
-        });
-    });
-});
-
-// Add smooth scrolling
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        e.preventDefault();
+    // Add hover effects to the specific elements
+    elementsWithSpecificStyle.forEach(element => {
+        // Store original styles
+        const originalBackground = window.getComputedStyle(element).backgroundColor;
+        const originalBoxShadow = window.getComputedStyle(element).boxShadow;
+        const originalTransform = window.getComputedStyle(element).transform;
         
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-            behavior: 'smooth'
+       /* // Add hover animations
+        element.addEventListener('mouseenter', function() {
+            // Enhanced hover effect
+            this.style.transition = "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+            this.style.boxShadow = "0 15px 40px rgba(0, 0, 0, 0.5)";
+            this.style.backgroundColor = "rgba(59, 16, 104, 0.3)"; // Slightly brighter purple
+            this.style.borderColor = "rgba(82, 0, 107, 0.3)";
+            
+            // Add a subtle glow effect
+            this.style.filter = "drop-shadow(0 0 15px rgba(106, 17, 203, 0.3))";
+        });
+        */
+
+        element.addEventListener('mouseleave', function() {
+            this.style.transform = originalTransform === 'none' ? 'translateY(0)' : originalTransform;
+            this.style.boxShadow = originalBoxShadow;
+            this.style.backgroundColor = "rgba(16, 63, 104, 0)"; // Slightly brighter purple
+            this.style.borderColor = "rgba(0, 0, 0, 0)";
+            this.style.filter = "none";
         });
     });
-});
+    
+    const skillItems = document.querySelectorAll('.skill-item');
+    skillItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            const icon = this.querySelector('.skill-icon');
+            if (icon) {
+                icon.style.transition = "all 0.3s ease";
+                icon.style.transform = 'scale(1.05)';
+                icon.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.4)';
+                icon.style.filter = "brightness(1.2)";
+                icon.style.backgroundColor = "rgba(0, 65, 112, 0.34)";
+                icon.style.borderColor = "rgba(255, 255, 255, 0.5)";
+            }
+        });
+        
+        item.addEventListener('mouseleave', function() {
+            const icon = this.querySelector('.skill-icon');
+            if (icon) {
+                icon.style.transform = 'scale(1)';
+                icon.style.boxShadow = '0 8px 32px 0 rgba(0, 0, 0, 0.37)';
+                icon.style.filter = "brightness(1)";
+                icon.style.backgroundColor = "rgba(42, 42, 90, 0)";
+                icon.style.borderColor = "rgba(255, 255, 255, 0.5)";
 
-// Add animation effects for elements when they come into view
-const animateOnScroll = function() {
+            }
+        });
+    });
+    
+    // Scroll animation for elements
+    const animateOnScroll = function() {
+        const elements = document.querySelectorAll('.job-card, .project-card, .education-card, .skill-item');
+        
+        elements.forEach(element => {
+            const elementPosition = element.getBoundingClientRect().top;
+            const screenPosition = window.innerHeight / 1.3;
+            
+            if (elementPosition < screenPosition) {
+                element.style.opacity = 1;
+                element.style.transform = 'translateY(0)';
+            }
+        });
+    };
+    
+    // Initialize animation properties with staggered delay
     const elements = document.querySelectorAll('.job-card, .project-card, .education-card, .skill-item');
     
-    elements.forEach(element => {
-        const elementPosition = element.getBoundingClientRect().top;
-        const screenPosition = window.innerHeight / 1.3;
-        
-        if (elementPosition < screenPosition) {
-            element.style.opacity = 1;
-            element.style.transform = 'translateY(0)';
+    elements.forEach((element, index) => {
+        element.style.opacity = 0;
+        element.style.transform = 'translateY(30px)';
+        element.style.transition = `opacity 0.3s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s, 
+                                  background-color 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease, border-color 0.3s ease`;
+    });
+    
+    // Run animations once on load
+    setTimeout(animateOnScroll, 300);
+    
+    // Add scroll event listener with throttling for better performance
+    let scrollTimeout;
+    window.addEventListener('scroll', function() {
+        if (!scrollTimeout) {
+            scrollTimeout = setTimeout(function() {
+                animateOnScroll();
+                scrollTimeout = null;
+            }, 20);
         }
     });
-};
+    
 
-// Initialize animation properties
-document.addEventListener('DOMContentLoaded', function() {
-    const elements = document.querySelectorAll('.job-card, .project-card, .education-card, .skill-item');
     
-    elements.forEach(element => {
-        element.style.opacity = 0;
-        element.style.transform = 'translateY(20px)';
-        element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-    });
+    // Add hover effect to download button
+    const downloadBtn = document.querySelector('.download-btn');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('mouseenter', function() {
+            this.style.transition = "all 0.3s ease";
+            this.style.backgroundColor = "rgba(255, 255, 255, 0.3)";
+            this.style.boxShadow = "0 5px 15px rgba(0, 0, 0, 0.3)";
+        });
+        
+        downloadBtn.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+            this.style.boxShadow = "none";
+        });
+    }
+});
+
+// Assuming this code exists somewhere in your JS file
+const shinyEffect = document.querySelector('.shiny-effect');
+let targetX = 0, targetY = 0;
+let currentX = 0, currentY = 0;
+const easeAmount = 0.5; // Lower value = slower movement (try values between 0.01 and 0.1)
+
+// Event listener for mouse movement
+document.addEventListener('mousemove', (e) => {
+    // Set target position based on cursor
+    targetX = e.clientX;
+    targetY = e.clientY;
+});
+
+// Animation loop for smooth movement
+function animateShiny() {
+    // Calculate distance between current and target position
+    let dx = targetX - currentX;
+    let dy = targetY - currentY;
     
-    // Run once on load
-    animateOnScroll();
+    // Move current position a small step toward target position
+    currentX += dx * easeAmount;
+    currentY += dy * easeAmount;
     
-    // Add scroll event listener
-    window.addEventListener('scroll', animateOnScroll);
+    // Apply the new position to the shiny effect
+    shinyEffect.style.left = `${currentX}px`;
+    shinyEffect.style.top = `${currentY}px`;
+    
+    // Continue the animation loop
+    requestAnimationFrame(animateShiny);
+}
+
+// Start the animation loop
+animateShiny();
+
+// Modal functionality
+function openModal(img) {
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImage");
+    modal.style.display = "block";
+    modalImg.src = img.src;
+}
+
+// Close modal when clicking the close button
+document.querySelector(".close").onclick = function() {
+    document.getElementById("imageModal").style.display = "none";
+}
+
+// Close modal when clicking outside the image
+document.getElementById("imageModal").onclick = function(e) {
+    if (e.target === this) {
+        this.style.display = "none";
+    }
+}
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === "Escape") {
+        document.getElementById("imageModal").style.display = "none";
+    }
 });
