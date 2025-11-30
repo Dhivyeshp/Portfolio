@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+window.addEventListener("load", function() {
+    document.getElementById("loader").style.display = "none";
+    document.getElementById("content").style.display = "block";
+});
+
     // Navigation functionality
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(item => {
@@ -116,15 +121,14 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(animateOnScroll, 300);
     
     // Add scroll event listener with throttling for better performance
-    let scrollTimeout;
+    let lastScrollTime = 0;
     window.addEventListener('scroll', function() {
-        if (!scrollTimeout) {
-            scrollTimeout = setTimeout(function() {
-                animateOnScroll();
-                scrollTimeout = null;
-            }, 20);
+        const now = Date.now();
+        if (now - lastScrollTime > 100) {
+            animateOnScroll();
+            lastScrollTime = now;
         }
-    });
+    }, { passive: true });
     
 
     
@@ -144,38 +148,41 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Assuming this code exists somewhere in your JS file
+// Optimized shiny effect with throttling and reduced updates
 const shinyEffect = document.querySelector('.shiny-effect');
 let targetX = 0, targetY = 0;
 let currentX = 0, currentY = 0;
-const easeAmount = 0.5; // Lower value = slower movement (try values between 0.01 and 0.1)
+const easeAmount = 0.1;
+let lastX = 0, lastY = 0;
+let mouseEventCount = 0;
 
-// Event listener for mouse movement
+// Throttled mouse tracking - update every other event
 document.addEventListener('mousemove', (e) => {
-    // Set target position based on cursor
-    targetX = e.clientX;
-    targetY = e.clientY;
+    mouseEventCount++;
+    if (mouseEventCount % 2 === 0) {
+        targetX = e.clientX;
+        targetY = e.clientY;
+    }
 });
 
-// Animation loop for smooth movement
 function animateShiny() {
-    // Calculate distance between current and target position
     let dx = targetX - currentX;
     let dy = targetY - currentY;
     
-    // Move current position a small step toward target position
-    currentX += dx * easeAmount;
-    currentY += dy * easeAmount;
+    if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+        currentX += dx * easeAmount;
+        currentY += dy * easeAmount;
+        
+        if (Math.abs(lastX - currentX) > 1 || Math.abs(lastY - currentY) > 1) {
+            shinyEffect.style.transform = `translate(calc(-50% + ${Math.round(currentX)}px), calc(-50% + ${Math.round(currentY)}px))`;
+            lastX = currentX;
+            lastY = currentY;
+        }
+    }
     
-    // Apply the new position to the shiny effect
-    shinyEffect.style.left = `${currentX}px`;
-    shinyEffect.style.top = `${currentY}px`;
-    
-    // Continue the animation loop
     requestAnimationFrame(animateShiny);
 }
 
-// Start the animation loop
 animateShiny();
 
 // Modal functionality
