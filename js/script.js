@@ -147,8 +147,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         modalImage.src = img.src;
         modalImage.alt = img.alt;
+        modal.hidden = false;
         modal.classList.add("open");
-        modal.setAttribute("aria-hidden", "false");
         document.body.style.overflow = "hidden";
     };
 
@@ -158,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         modal.classList.remove("open");
-        modal.setAttribute("aria-hidden", "true");
+        modal.hidden = true;
         document.body.style.overflow = "";
     };
 
