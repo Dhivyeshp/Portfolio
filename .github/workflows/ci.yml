@@ -1,10 +1,38 @@
-name: Test
+name: Portfolio CI
 
 on:
   push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
 
 jobs:
-  test:
+  checks:
     runs-on: ubuntu-latest
+
     steps:
-      - run: echo hello
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Ensure index.html exists
+        run: |
+          if [ ! -f index.html ]; then
+            echo "index.html not found"
+            exit 1
+          fi
+
+      - name: Install HTML validator
+        run: npm install -g html-validate
+
+      - name: Validate HTML files
+        run: html-validate "*.html"
+
+      - name: Check for broken links
+        uses: lycheeverse/lychee-action@v1
+        with:
+          args: --verbose --no-progress "./**/*.html"
