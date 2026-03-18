@@ -18,21 +18,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
-      - name: Ensure index.html exists
-        run: |
-          if [ ! -f index.html ]; then
-            echo "index.html not found"
-            exit 1
-          fi
+      - name: Install dependencies
+        run: npm install
 
-      - name: Install HTML validator
-        run: npm install -g html-validate
-
-      - name: Validate HTML files
-        run: html-validate "*.html"
-
-      - name: Check for broken links
-        uses: lycheeverse/lychee-action@v1
-        with:
-          args: --verbose --no-progress "./**/*.html"
+      - name: Build Next.js app
+        run: npm run build

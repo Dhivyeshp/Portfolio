@@ -4,70 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dhivyesh Prithiviraj | Software Engineer</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260316b">
+    <link rel="stylesheet" href="css/styles.css?v=20260316g">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/devicon@2.15.1/devicon.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        @keyframes forceSlideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-64px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        @keyframes forceRiseIn {
-            from {
-                opacity: 0;
-                transform: translateY(28px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        body[data-animate-ready="true"] .hero-rail {
-            animation: forceSlideInLeft 0.9s cubic-bezier(0.22, 1, 0.36, 1) both !important;
-            animation-delay: 0.08s !important;
-        }
-
-        body[data-animate-ready="true"] .hero-copy .reveal-left:nth-child(1) {
-            animation: forceSlideInLeft 1s cubic-bezier(0.22, 1, 0.36, 1) both !important;
-            animation-delay: 0.22s !important;
-        }
-
-        body[data-animate-ready="true"] .hero-copy .reveal-left:nth-child(2) {
-            animation: forceSlideInLeft 1s cubic-bezier(0.22, 1, 0.36, 1) both !important;
-            animation-delay: 0.4s !important;
-        }
-
-        body[data-animate-ready="true"] .hero-copy .reveal-left:nth-child(3) {
-            animation: forceSlideInLeft 1s cubic-bezier(0.22, 1, 0.36, 1) both !important;
-            animation-delay: 0.58s !important;
-        }
-
-        body[data-animate-ready="true"] .hero-copy .reveal-left:nth-child(4) {
-            animation: forceSlideInLeft 1s cubic-bezier(0.22, 1, 0.36, 1) both !important;
-            animation-delay: 0.76s !important;
-        }
-
-        body[data-animate-ready="true"] .force-in-view.force-horizontal {
-            animation: forceSlideInLeft 0.92s cubic-bezier(0.22, 1, 0.36, 1) both !important;
-        }
-
-        body[data-animate-ready="true"] .force-in-view.force-vertical {
-            animation: forceRiseIn 0.85s cubic-bezier(0.22, 1, 0.36, 1) both !important;
-        }
-    </style>
 </head>
 <body>
+    <div class="cursor-shell" id="cursorShell" aria-hidden="true">
+        <div class="cursor-ring" id="cursorRing"></div>
+        <div class="cursor-orb" id="cursorOrb"></div>
+        <span class="cursor-text" id="cursorText"></span>
+    </div>
+
     <div id="loader" aria-hidden="true">
         <div class="data-stream">
             <span></span><span></span><span></span><span></span>
@@ -119,21 +69,25 @@
                     </aside>
 
                     <div class="hero-copy">
-                        <p class="availability reveal-left"><span></span> Available for internships</p>
-                        <h1 class="reveal-left reveal-delay-1">
-                            Hi! I'm
-                            <span class="pill">Dhivyesh</span>
-                            a
-                            <span class="pill">Software Engineer</span>
-                            from
-                            <span class="pill">Dallas</span>
-                            building clean, high-impact digital products.
+                        <h1 class="hero-heading reveal-left reveal-delay-1">
+                            <span class="headline-row">
+                                <span class="headline-copy">Hey, I'm</span>
+                                <span class="pill">Dhivyesh</span>
+                            </span>
+                            <span class="headline-row">
+                                <span class="headline-copy">a</span>
+                                <span class="pill">Software Engineer</span>
+                            </span>
+                            <span class="headline-row">
+                                <span class="headline-copy">from</span>
+                                <span class="pill">Dallas</span>
+                            </span>
                         </h1>
                         <p class="hero-intro reveal-left reveal-delay-2">
-                            I design and ship full-stack, mobile, and ML-powered products with a focus on clarity, speed, and real-world usefulness.
+                            Building clean, high-impact digital products.
                         </p>
                         <div class="hero-actions reveal-left reveal-delay-3">
-                            <a href="#projects" class="primary-pill">See selected work <i class="fas fa-arrow-up-right-from-square"></i></a>
+                            <a href="#projects" class="primary-pill">See my work <i class="fas fa-arrow-up-right-from-square"></i></a>
                         </div>
                     </div>
                 </section>
@@ -401,31 +355,7 @@
         <img class="modal-content" id="modalImage" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="Expanded project preview">
     </div>
 
-    <script src="js/script.js?v=20260316b"></script>
-    <script>
-        window.addEventListener("load", () => {
-            window.setTimeout(() => {
-                document.body.setAttribute("data-animate-ready", "true");
-            }, 380);
-
-            if (!("IntersectionObserver" in window)) {
-                return;
-            }
-
-            const scrollItems = document.querySelectorAll(".force-horizontal, .force-vertical");
-            const observer = new IntersectionObserver((entries, obs) => {
-                entries.forEach((entry) => {
-                    if (!entry.isIntersecting) {
-                        return;
-                    }
-
-                    entry.target.classList.add("force-in-view");
-                    obs.unobserve(entry.target);
-                });
-            }, { threshold: 0.18, rootMargin: "0px 0px -10% 0px" });
-
-            scrollItems.forEach((item) => observer.observe(item));
-        });
-    </script>
+    <script src="js/script.js?v=20260316g"></script>
 </body>
 </html>
+
