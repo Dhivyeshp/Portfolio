@@ -277,7 +277,7 @@ export default function BrainViz() {
       const p   = new THREE.Vector3(...n.pos);
       const r   = n.main ? 0.052 : 0.028;
       const geo = new THREE.SphereGeometry(r, 8, 6);
-      const col = n.main ? 0x888899 : 0x444455;
+      const col = n.main ? 0x888888 : 0x444444;
       const mat = new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: n.main ? 0.70 : 0.40 });
       const dot = new THREE.Mesh(geo, mat);
       dot.position.copy(p);
@@ -318,9 +318,9 @@ export default function BrainViz() {
     let ripple = null; // { startTime, edgeDists, maxDist }
 
     /* ── Smooth color targets ── */
-    const COL_NORMAL = new THREE.Color(0x808090);
-    const COL_HOT    = new THREE.Color(0xffffff);
-    const COL_DIM    = new THREE.Color(0x2e2e3a);
+    const COL_NORMAL = new THREE.Color(0x808080);
+    const COL_HOT    = new THREE.Color(0xc0c0c0); // soft highlight, not pure white
+    const COL_DIM    = new THREE.Color(0x2e2e2e);
     const nodeColorTargets = {};
     NODES.forEach((n) => { nodeColorTargets[n.id] = COL_NORMAL.clone(); });
     let edgeHoverBrightness = 0; // 0–1, lerped each frame
@@ -334,7 +334,7 @@ export default function BrainViz() {
       const fp    = new THREE.Vector3(...from.pos);
       const tp    = new THREE.Vector3(...to.pos);
       const cross = CLUSTER[a] !== CLUSTER[b];
-      const color   = cross ? 0x2a3a55 : 0x3a3a60;
+      const color   = cross ? 0x303030 : 0x3a3a3a;
       const opacity = cross ? 0.32 : 0.50;
 
       const pts = cross
@@ -345,12 +345,12 @@ export default function BrainViz() {
       const mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity, depthWrite: false });
       coreGroup.add(new THREE.Line(geo, mat));
       geosToDispose.push({ geo, mat });
-      edgeLineMats.push({ mat, baseOpacity: opacity, baseColor: new THREE.Color(color), cross });
+      edgeLineMats.push({ mat, baseOpacity: opacity, baseColor: new THREE.Color(color), cross, hoverT: 0, pts });
 
       // Only animate ~55% of edges
       if (edgeIdx % 2 === 0 || cross) {
         const pg  = new THREE.SphereGeometry(cross ? 0.022 : 0.016, 5, 3);
-        const pm  = new THREE.MeshBasicMaterial({ color: cross ? 0x4466aa : 0x5555aa, transparent: true, opacity: 0, depthWrite: false });
+        const pm  = new THREE.MeshBasicMaterial({ color: cross ? 0x606060 : 0x505050, transparent: true, opacity: 0, depthWrite: false });
         const pms = new THREE.Mesh(pg, pm);
         coreGroup.add(pms);
         geosToDispose.push({ geo: pg, mat: pm });
@@ -367,7 +367,7 @@ export default function BrainViz() {
     }
     const bgGeo = new THREE.BufferGeometry();
     bgGeo.setAttribute("position", new THREE.BufferAttribute(bgArr, 3));
-    const bgMat = new THREE.PointsMaterial({ color: 0x2a2a40, size: 0.016, transparent: true, opacity: 0.55 });
+    const bgMat = new THREE.PointsMaterial({ color: 0x282828, size: 0.016, transparent: true, opacity: 0.55 });
     coreGroup.add(new THREE.Points(bgGeo, bgMat));
     geosToDispose.push({ geo: bgGeo, mat: bgMat });
 
@@ -388,7 +388,7 @@ export default function BrainViz() {
       }
       const geo  = new THREE.BufferGeometry().setFromPoints(pts);
       const rest = new Float32Array(geo.attributes.position.array);
-      const mat  = new THREE.LineBasicMaterial({ color: 0x223344, transparent: true, opacity: 0.12 + rng() * 0.07, depthWrite: false });
+      const mat  = new THREE.LineBasicMaterial({ color: 0x222222, transparent: true, opacity: 0.12 + rng() * 0.07, depthWrite: false });
       scene.add(new THREE.Line(geo, mat));
       geosToDispose.push({ geo, mat });
       tendrilAnims.push({ geo, rest, phase: rng() * Math.PI * 2 });
@@ -402,12 +402,12 @@ export default function BrainViz() {
         pts.push(new THREE.Vector3(l.x + dx, l.y + dy, 0));
       }
       const geo = new THREE.BufferGeometry().setFromPoints(pts);
-      const mat = new THREE.LineBasicMaterial({ color: 0x1a3060, transparent: true, opacity: op, depthWrite: false });
+      const mat = new THREE.LineBasicMaterial({ color: 0x202020, transparent: true, opacity: op, depthWrite: false });
       scene.add(new THREE.Line(geo, mat));
       geosToDispose.push({ geo, mat });
       pts.slice(1, -1).forEach((p) => {
         const dg = new THREE.SphereGeometry(0.018, 5, 3);
-        const dm = new THREE.MeshBasicMaterial({ color: 0x1e3060, transparent: true, opacity: op + 0.1 });
+        const dm = new THREE.MeshBasicMaterial({ color: 0x242424, transparent: true, opacity: op + 0.1 });
         const ds = new THREE.Mesh(dg, dm); ds.position.copy(p);
         scene.add(ds); geosToDispose.push({ geo: dg, mat: dm });
       });
@@ -466,24 +466,29 @@ export default function BrainViz() {
     function hideTip() { tip.style.opacity = "0"; }
 
     /* ── Click ── */
-    const allMeshes = hitMeshes.map((h) => h.mesh);
     const onClick = (e) => {
       if (modalOpen) return;
       const r  = el.getBoundingClientRect();
-      const mx = ((e.clientX - r.left) / r.width  - 0.5) * 2;
-      const my = -((e.clientY - r.top)  / r.height - 0.5) * 2;
-      const cv2 = new THREE.Vector2(mx, my);
-      const rc  = new THREE.Raycaster();
+      const cv2 = new THREE.Vector2(
+        ((e.clientX - r.left) / r.width  - 0.5) * 2,
+       -((e.clientY - r.top)  / r.height - 0.5) * 2,
+      );
+      const rc = new THREE.Raycaster();
       rc.setFromCamera(cv2, camera);
-      const hits = rc.intersectObjects(allMeshes, false);
-      if (hits.length > 0) {
-        const hit = hitMeshes.find((h) => h.mesh === hits[0].object);
-        if (hit) openModal(hit.nodeId);
-      }
+      let closestDist = Infinity, closestId = null;
+      NODES.forEach((n) => {
+        const wp = new THREE.Vector3(...n.pos);
+        coreGroup.localToWorld(wp);
+        const d = rc.ray.distanceToPoint(wp);
+        if (d < closestDist) { closestDist = d; closestId = n.id; }
+      });
+      if (closestDist < 0.35 && closestId) openModal(closestId);
     };
     renderer.domElement.addEventListener("click", onClick);
 
     /* ── Animation ── */
+    const HOT_EDGE = new THREE.Color(0.70, 0.70, 0.70);
+    const segA = new THREE.Vector3(), segB = new THREE.Vector3();
     let raf;
     let rx = 0, ry = 0;
     const clock = new THREE.Clock();
@@ -497,51 +502,71 @@ export default function BrainViz() {
       coreGroup.rotation.x = rx;
       coreGroup.rotation.y = ry;
 
-      // Hover detection (skip when modal is open)
+      // Proximity hover — ray-to-point distance, smooth + hysteresis
       if (!modalOpen) {
         mouseVec.set(mouse.current.x, mouse.current.y);
         raycaster.setFromCamera(mouseVec, camera);
-        const hits = raycaster.intersectObjects(allMeshes, false);
-        if (hits.length > 0) {
-          const hit = hitMeshes.find((h) => h.mesh === hits[0].object);
-          if (hit && hit.nodeId !== hoveredId) {
-            hoveredId = hit.nodeId;
-            const wp = new THREE.Vector3();
-            hits[0].object.getWorldPosition(wp);
-            const sp = wp.clone().project(camera);
-            showTip(hoveredId, (sp.x * 0.5 + 0.5) * W, (-sp.y * 0.5 + 0.5) * H);
-            // Set smooth color targets
-            Object.keys(nodeColorTargets).forEach((id) => {
-              nodeColorTargets[id].copy(id === hoveredId ? COL_HOT : COL_DIM);
-            });
-            // Start ripple from hovered node
+
+        let closestDist = Infinity, closestId = null;
+        NODES.forEach((n) => {
+          const wp = new THREE.Vector3(...n.pos);
+          coreGroup.localToWorld(wp);
+          const d = raycaster.ray.distanceToPoint(wp);
+          if (d < closestDist) { closestDist = d; closestId = n.id; }
+        });
+
+        const ENTER = 0.33, LEAVE = 0.54;
+
+        if (closestDist < ENTER && closestId !== hoveredId) {
+          hoveredId = closestId;
+          const node = nodeMap[hoveredId];
+          const wp2 = new THREE.Vector3(...node.pos);
+          coreGroup.localToWorld(wp2);
+          const sp = wp2.clone().project(camera);
+          showTip(hoveredId, (sp.x * 0.5 + 0.5) * W, (-sp.y * 0.5 + 0.5) * H);
+          Object.keys(nodeColorTargets).forEach((id) => {
+            nodeColorTargets[id].copy(id === hoveredId ? COL_HOT : COL_DIM);
+          });
+          // Only restart ripple if previous one has mostly played out
+          const rippleAge = ripple ? t - ripple.startTime : Infinity;
+          if (rippleAge > 0.35) {
             const edgeDists = bfsEdgeDists(hoveredId);
-            const maxDist   = Math.max(...edgeDists.values(), 0);
-            ripple = { startTime: t, edgeDists, maxDist };
+            ripple = { startTime: t, edgeDists, maxDist: Math.max(...edgeDists.values(), 0) };
           }
-          renderer.domElement.style.cursor = "pointer";
-        } else {
-          if (hoveredId) {
-            hoveredId = null;
-            hideTip();
-            Object.keys(nodeColorTargets).forEach((id) => nodeColorTargets[id].copy(COL_NORMAL));
-          }
-          renderer.domElement.style.cursor = "default";
+        } else if (hoveredId && closestDist > LEAVE) {
+          hoveredId = null;
+          hideTip();
+          Object.keys(nodeColorTargets).forEach((id) => nodeColorTargets[id].copy(COL_NORMAL));
         }
+        renderer.domElement.style.cursor = (closestDist < LEAVE && closestId) ? "pointer" : "default";
       }
 
-      // Smooth sprite label colors
+      // Smooth sprite label colors — fast lerp for snappy response
       Object.entries(nodeSprites).forEach(([id, spr]) => {
-        spr.material.color.lerp(nodeColorTargets[id], 0.07);
+        spr.material.color.lerp(nodeColorTargets[id], 0.16);
       });
 
-      // Edge ambient brightness lerps toward 1 on hover, 0 on leave
-      edgeHoverBrightness += ((hoveredId ? 1 : 0) - edgeHoverBrightness) * 0.055;
-      edgeLineMats.forEach((entry) => {
+      // Per-edge hover — ray-to-segment proximity
+      let minEdgeDist = Infinity, hovEdgeIdx = -1;
+      edgeLineMats.forEach((entry, idx) => {
         if (!entry) return;
-        entry.currentBase = entry.baseOpacity * (1 + edgeHoverBrightness * 0.9);
+        const [a, b] = EDGES[idx];
+        const fn = nodeMap[a], tn = nodeMap[b];
+        if (!fn || !tn) return;
+        segA.set(...fn.pos); coreGroup.localToWorld(segA);
+        segB.set(...tn.pos); coreGroup.localToWorld(segB);
+        const dSq = raycaster.ray.distanceSqToSegment(segA, segB);
+        if (dSq < minEdgeDist) { minEdgeDist = dSq; hovEdgeIdx = idx; }
+      });
+      const edgeHoverActive = !hoveredId && Math.sqrt(minEdgeDist) < 0.07;
+
+      edgeLineMats.forEach((entry, idx) => {
+        if (!entry) return;
+        const target = edgeHoverActive && idx === hovEdgeIdx ? 1 : 0;
+        entry.hoverT += (target - entry.hoverT) * 0.18;
+        entry.currentBase = entry.baseOpacity + entry.hoverT * 0.42;
         entry.mat.opacity = entry.currentBase;
-        entry.mat.color.lerp(entry.baseColor, 0.07); // drift colour back to base
+        entry.mat.color.lerpColors(entry.baseColor, HOT_EDGE, entry.hoverT * 0.65);
       });
 
       mainDotMats.forEach(({ mat, idx }) => {
@@ -564,25 +589,25 @@ export default function BrainViz() {
         }
       });
 
-      // Ripple: wave of light cascades along edges from hovered node
       if (ripple) {
         const elapsed   = t - ripple.startTime;
-        const waveSpeed = 2.5; // hops/sec
-        const flashDur  = 0.55;
+        const waveSpeed = 4.0; 
+        const flashDur  = 0.38;
         let   allDone   = true;
         ripple.edgeDists.forEach((dist, idx) => {
+          if (dist > 0.5) return; // only direct connections
           const entry = edgeLineMats[idx];
           if (!entry) return;
-          const { mat, baseOpacity, baseColor, cross } = entry;
+          const { mat, baseColor, cross } = entry;
           const since = elapsed - dist / waveSpeed;
           if (since < flashDur) allDone = false;
           if (since >= 0 && since < flashDur) {
             const flash = Math.sin((since / flashDur) * Math.PI);
             mat.opacity = entry.currentBase + flash * (cross ? 0.38 : 0.45);
             mat.color.setRGB(
-              baseColor.r + flash * 0.18,
-              baseColor.g + flash * 0.32,
-              baseColor.b + flash * 0.55,
+              baseColor.r + flash * 0.38,
+              baseColor.g + flash * 0.38,
+              baseColor.b + flash * 0.38,
             );
           }
         });

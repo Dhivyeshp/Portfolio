@@ -15,7 +15,8 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+
 
 body {
   min-height: 100vh;
@@ -42,17 +43,40 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   align-items: center;
   justify-content: space-between;
   padding: 0 32px;
-  /* transparent by default — sits over the hero canvas */
   background: transparent;
-  transition: background 0.4s ease, border-color 0.4s ease;
 }
 
-/* Nav gets a background once you scroll past hero */
-.site-nav.scrolled {
-  background: rgba(4, 4, 4, 0.92);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--gray-3);
+/* Glass layer — fades in as one unit, no janky backdrop-filter transition */
+.site-nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 4, 4, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  opacity: 0;
+  transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
 }
+
+/* Bottom line — sweeps left → right */
+.site-nav::after {
+  content: "";
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--gray-3);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.site-nav.scrolled::before { opacity: 1; }
+.site-nav.scrolled::after  { transform: scaleX(1); }
+
+/* Nav content must sit above ::before glass layer */
+.nav-brand, .nav-links, .nav-avail { position: relative; z-index: 1; }
 
 .nav-brand {
   font-family: var(--font-mono, monospace);
@@ -107,6 +131,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   z-index: 0;
 }
 
+
 /* Top gradient — softens into nav */
 .hero::before {
   content: "";
@@ -160,8 +185,16 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   letter-spacing: -0.035em;
   line-height: 1.06;
   color: var(--gray-12);
+  margin-bottom: 16px;
+  max-width: 16ch;
+}
+
+.hero-sub {
+  font-size: clamp(13px, 1.4vw, 16px);
+  font-weight: 400;
+  color: var(--gray-8);
+  letter-spacing: 0.01em;
   margin-bottom: 32px;
-  max-width: 14ch;
 }
 
 .hero-stats {
@@ -187,6 +220,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+
 
 /* Scroll cue */
 .scroll-cue {
@@ -221,7 +255,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
 .page {
   max-width: 960px;
   margin: 0 auto;
-  padding: 0 32px 0;
+  padding: 0;
 }
 
 /* ── Section base ───────────────────────────────────── */
@@ -241,25 +275,61 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   margin-bottom: 48px;
 }
 
+/* ── Halftone accent — full section overlay ─────────── */
+
+.ht {
+  position:       absolute;
+  inset:          0;
+  pointer-events: none;
+  overflow:       hidden;
+}
+
 /* ── Experience ─────────────────────────────────────── */
 
-.exp-list { display: flex; flex-direction: column; }
+.exp-section { position: relative; overflow: visible; }
+
+.exp-list {
+  display: flex;
+  flex-direction: column;
+}
 
 .exp-item {
+  --hover-t: 0;
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 12px;
   padding: 28px 0;
   border-bottom: 1px solid var(--gray-3);
 }
-.exp-item:last-child { border-bottom: 0; padding-bottom: 0; }
+
+/* full-viewport-width hover bg — driven by JS lerp, same feel as cursor */
+.exp-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  background: rgba(255, 255, 255, 0.04);
+  opacity: var(--hover-t);
+  pointer-events: none;
+}
+
+.exp-item:last-child {
+  border-bottom: 0;
+  padding-bottom: 28px;
+}
 
 .exp-top {
+  position: relative;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
 }
+
 
 .exp-company {
   font-family: var(--font-mono, monospace);
@@ -273,7 +343,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   font-size: 17px;
   font-weight: 500;
   letter-spacing: -0.025em;
-  color: var(--gray-12);
+  color: var(--exp-role-color, var(--gray-12));
 }
 .exp-date {
   font-family: var(--font-mono, monospace);
@@ -284,7 +354,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   margin-top: 2px;
 }
 
-.exp-bullets { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.exp-bullets { position: relative; list-style: none; display: flex; flex-direction: column; gap: 5px; }
 .exp-bullets li {
   font-size: 14px;
   color: var(--gray-7);
@@ -299,26 +369,43 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
 .phil-list { display: flex; flex-direction: column; }
 
 .phil-item {
+  --hover-t: 0;
+  position: relative;
   display: grid;
   grid-template-columns: 40px 1fr;
   gap: 24px;
   padding: 26px 0;
   border-bottom: 1px solid var(--gray-3);
 }
+.phil-item::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  background: rgba(255, 255, 255, 0.04);
+  opacity: var(--hover-t);
+  pointer-events: none;
+}
 .phil-item:last-child { border-bottom: 0; }
 
 .phil-num {
+  position: relative;
   font-family: var(--font-mono, monospace);
   font-size: 11px;
   color: var(--gray-5);
   letter-spacing: 0.06em;
   padding-top: 2px;
 }
+.phil-body {
+  position: relative;
+}
 .phil-body h3 {
   font-size: 15px;
   font-weight: 500;
   letter-spacing: -0.02em;
-  color: var(--gray-11);
+  color: var(--phil-title-color, var(--gray-11));
   margin-bottom: 5px;
 }
 .phil-body p { font-size: 13px; line-height: 1.6; color: var(--gray-6); }
@@ -414,9 +501,9 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   letter-spacing: -0.02em;
   line-height: 1.15;
   cursor: default;
-  transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.stack-word:hover { opacity: 1 !important; transform: scale(1.07); }
+.stack-word:hover { transform: scale(1.06); }
 
 /* ── Contact ────────────────────────────────────────── */
 
@@ -521,7 +608,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
 /* ── Responsive ─────────────────────────────────────── */
 
 @media (max-width: 680px) {
-  .site-nav, .hero-content, .page { padding-left: 20px; padding-right: 20px; }
+  .site-nav, .hero-content { padding-left: 20px; padding-right: 20px; }
   .hero-content { padding-bottom: 44px; }
   .hero-h1 { font-size: clamp(28px, 9vw, 40px); }
   .hero-stats { gap: 20px; }
