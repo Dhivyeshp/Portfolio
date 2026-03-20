@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
+
+const FluidSim = dynamic(() => import("./FluidSim"), { ssr: false, loading: () => null });
 
 /* ── Work data ─────────────────────────────────────────── */
 const CLIENTS = ["OpTic Gaming", "FaZe Clan", "Atlanta FaZe", "Miami Dolphins"];
@@ -164,11 +167,11 @@ const fadeUp = {
 };
 const stagger = {
   hidden: {},
-  show:   { transition: { staggerChildren: 0.07 } },
+  show:   { transition: { staggerChildren: 0.08, delayChildren: 0.65 } },
 };
 const staggerFast = {
   hidden: {},
-  show:   { transition: { staggerChildren: 0.05 } },
+  show:   { transition: { staggerChildren: 0.06, delayChildren: 0.85 } },
 };
 
 /* ── Component ─────────────────────────────────────────── */
@@ -192,6 +195,18 @@ export default function SproutOverlay({ isSproutOpen, origin, onClose }) {
                             Math.max(oy, canvas.height - oy)) * 1.08;
     return { ctx: canvas.getContext("2d"), W: canvas.width, H: canvas.height, ox, oy, maxR };
   };
+
+  // Paint solid black immediately when canvas mounts — prevents white flash
+  useLayoutEffect(() => {
+    if (phase !== "entering") return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#040404";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }, [phase]); // eslint-disable-line
 
   useEffect(() => {
     if (phase !== "entering") return;
@@ -247,14 +262,15 @@ export default function SproutOverlay({ isSproutOpen, origin, onClose }) {
   return (
     <>
       <div className="sprout-page" style={{ pointerEvents: phase === "open" ? "all" : "none" }}>
+        <FluidSim />
         <button className="sprout-close" onClick={close} disabled={phase !== "open"}>✕</button>
 
-        <div className="sprout-wrapper">
+        <div className="sprout-wrapper" style={{ position: "relative", zIndex: 1 }}>
           {/* ── Header ── */}
           <motion.div
             className="sprout-inner"
             initial="hidden"
-            animate={phase === "open" ? "show" : "hidden"}
+            animate={phase === "entering" || phase === "open" ? "show" : "hidden"}
             variants={stagger}
           >
             <motion.p className="sprout-label" variants={fadeUp}>Studio</motion.p>
@@ -278,7 +294,7 @@ export default function SproutOverlay({ isSproutOpen, origin, onClose }) {
           <motion.div
             className="sprout-work"
             initial="hidden"
-            animate={phase === "open" ? "show" : "hidden"}
+            animate={phase === "entering" || phase === "open" ? "show" : "hidden"}
             variants={stagger}
           >
             <motion.p className="sprout-label" variants={fadeUp}>Selected Work</motion.p>
