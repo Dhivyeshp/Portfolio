@@ -9,6 +9,11 @@ const BrainViz = dynamic(() => import("./components/BrainViz"), {
   loading: () => null,
 });
 
+const FluidSim = dynamic(() => import("./components/FluidSim"), {
+  ssr: false,
+  loading: () => null,
+});
+
 const DallasHalftone = dynamic(() => import("./components/DallasHalftone"), {
   ssr: false,
   loading: () => null,
@@ -550,6 +555,8 @@ export default function Page() {
 
       {/* ── Full-screen hero with 3D background ── */}
       <section className="hero" style={{ position: "relative" }}>
+        {/* Glass fluid sim — white shimmer, behind everything */}
+        <FluidSim glass />
         {/* 3D canvas fills entire hero */}
         <motion.div
           className="hero-canvas"
