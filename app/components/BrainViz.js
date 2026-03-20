@@ -42,6 +42,7 @@ const NODES = [
   { id: "agenteco",   main: false, label: "Agent Ecosystem",    pos: [ 1.15, -0.72,  0.00] },
   // Leadership — top center
   { id: "leadership", main: true,  label: "Leadership",        pos: [-0.40,  1.95, -0.10] },
+  { id: "sprout", main: true, label: "Sprout Designs", pos: [ 0.40,  0.18, 0.15] },
   { id: "hackutd",    main: false, label: "HackUTD",            pos: [-0.85,  2.70,  0.00] },
   { id: "acm",        main: false, label: "ACM Dev Lead",       pos: [ 0.30,  2.55, -0.10] },
   { id: "mcf",        main: false, label: "Mark Cuban Fdn",     pos: [-0.15,  1.25,  0.10] },
@@ -63,6 +64,7 @@ const EDGES = [
   ["monte","cloud"], ["finsights","cloud"],
   ["agenteco","ai"], ["nrve","ai"],
   ["raspi","asl"], ["hackutd","hacksite"], ["race","cloud"],
+  ["leadership", "sprout"], ["web", "sprout"],
 ];
 
 const CLUSTER = {
@@ -72,6 +74,7 @@ const CLUSTER = {
   web:3,portfolio:3,nextjs:3,arviewer:3,hacksite:3,
   projects:4,race:4,vertera:4,seatswap:4,agenteco:4,
   leadership:5,hackutd:5,acm:5,mcf:5,
+  sprout: 5,
 };
 
 const NODE_INFO = {
@@ -105,9 +108,10 @@ const NODE_INFO = {
   hackutd:   { title:"HackUTD",               body:"Marketing Lead + Tech. Organized 1,000+ hacker event with NVIDIA, IBM, and Goldman Sachs sponsorships.", image:"/images/hackutd.png" },
   acm:       { title:"ACM Dev Lead",          body:"Built a full-stack event platform for 200+ students. Created matchmaking workflow cutting team formation time by 65%.", image:"/images/acm.png" },
   mcf:       { title:"Mark Cuban Foundation", body:"Technical Ambassador + AI Program Lead. Mentored 1,500+ students across nationwide AI Bootcamp programs.", image:"/images/mcf.jpg" },
+  sprout: { title: "Sprout Designs", body: "Design and engineering studio building digital experiences, branding systems, and motion for esports and sports organizations." },
 };
 
-export default function BrainViz() {
+export default function BrainViz({ onSproutClick }) {
   const mountRef = useRef(null);
   const mouse    = useRef({ x: 0, y: 0 });
 
@@ -153,9 +157,9 @@ export default function BrainViz() {
     Object.assign(modal.style, {
       position:"fixed", inset:"0", zIndex:"200",
       display:"flex", alignItems:"center", justifyContent:"center",
-      background:"rgba(4,4,4,0.82)", backdropFilter:"blur(12px)",
+      background:"rgba(4,4,4,0)", backdropFilter:"blur(0px)",
       opacity:"0", pointerEvents:"none",
-      transition:"opacity 0.22s ease",
+      transition:"opacity 0.45s cubic-bezier(0.22,1,0.36,1), background 0.45s cubic-bezier(0.22,1,0.36,1), backdrop-filter 0.45s cubic-bezier(0.22,1,0.36,1)",
       fontFamily:"var(--font-sans, sans-serif)",
     });
 
@@ -164,7 +168,9 @@ export default function BrainViz() {
       background:"#0d0d14", border:"1px solid rgba(255,255,255,0.09)",
       borderRadius:"12px", padding:"32px", maxWidth:"460px", width:"90%",
       maxHeight:"80vh", overflowY:"auto",
-      transform:"translateY(12px)", transition:"transform 0.22s ease",
+      opacity:"0",
+      transform:"translateY(18px) scale(0.96)",
+      transition:"transform 0.48s cubic-bezier(0.22,1,0.36,1), opacity 0.42s cubic-bezier(0.22,1,0.36,1)",
     });
 
     const closeBtn = document.createElement("button");
@@ -213,15 +219,21 @@ export default function BrainViz() {
       }
 
       modal.style.opacity = "1";
+      modal.style.background = "rgba(4,4,4,0.82)";
+      modal.style.backdropFilter = "blur(12px)";
       modal.style.pointerEvents = "auto";
-      card.style.transform = "translateY(0)";
+      card.style.transform = "translateY(0) scale(1)";
+      card.style.opacity = "1";
       modalOpen = true;
     }
 
     function closeModal() {
       modal.style.opacity = "0";
+      modal.style.background = "rgba(4,4,4,0)";
+      modal.style.backdropFilter = "blur(0px)";
       modal.style.pointerEvents = "none";
-      card.style.transform = "translateY(12px)";
+      card.style.transform = "translateY(18px) scale(0.96)";
+      card.style.opacity = "0";
       modalOpen = false;
     }
 
@@ -275,7 +287,7 @@ export default function BrainViz() {
 
     NODES.forEach((n) => {
       const p   = new THREE.Vector3(...n.pos);
-      const r   = n.main ? 0.052 : 0.028;
+      const r   = n.id === "sprout" ? 0.075 : n.main ? 0.052 : 0.028;
       const geo = new THREE.SphereGeometry(r, 8, 6);
       const col = n.main ? 0x888888 : 0x444444;
       const mat = new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: n.main ? 0.70 : 0.40 });
@@ -482,7 +494,13 @@ export default function BrainViz() {
         const d = rc.ray.distanceToPoint(wp);
         if (d < closestDist) { closestDist = d; closestId = n.id; }
       });
-      if (closestDist < 0.35 && closestId) openModal(closestId);
+      if (closestDist < 0.35 && closestId) {
+        if (closestId === "sprout" && onSproutClick) {
+          onSproutClick({ x: e.clientX, y: e.clientY });
+        } else {
+          openModal(closestId);
+        }
+      }
     };
     renderer.domElement.addEventListener("click", onClick);
 

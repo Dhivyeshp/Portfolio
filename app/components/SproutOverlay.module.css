@@ -1,0 +1,142 @@
+/* The sprout page itself is the masked element — content reveals through the leaf sprite */
+
+.page {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: #040404;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-mask-image: url('/images/nature-sprite.png');
+  mask-image: url('/images/nature-sprite.png');
+  -webkit-mask-size: 2300% 100%;
+  mask-size: 2300% 100%;
+}
+
+/* Opening: sprite sweeps 0% → 100%, revealing page content through leaf pattern */
+.pageEnter {
+  -webkit-mask-position: 0% 0;
+  mask-position: 0% 0;
+  pointer-events: none;
+  animation: maskIn 0.9s steps(22, end) forwards;
+}
+
+/* Fully open: mask at 100% = fully opaque, all content visible */
+.pageOpen {
+  -webkit-mask-position: 100% 0;
+  mask-position: 100% 0;
+  pointer-events: all;
+}
+
+/* Closing: sprite retreats 100% → 0%, page disappears through leaf pattern */
+.pageExit {
+  -webkit-mask-position: 100% 0;
+  mask-position: 100% 0;
+  pointer-events: none;
+  animation: maskOut 0.9s steps(22, end) forwards;
+}
+
+.close {
+  position: fixed;
+  top: 24px;
+  right: 32px;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  z-index: 9001;
+  transition: color 0.2s ease;
+  background: none;
+  border: none;
+  padding: 8px;
+  line-height: 1;
+}
+.close:hover { color: rgba(255, 255, 255, 0.85); }
+.close:disabled { pointer-events: none; opacity: 0; }
+
+.inner {
+  max-width: 760px;
+  width: 90%;
+  padding: 80px 0;
+}
+
+.label {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #4d4d4d;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: clamp(52px, 8vw, 96px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: #ebebeb;
+  margin-bottom: 48px;
+}
+
+.clients {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-bottom: 48px;
+  border-top: 1px solid #101010;
+  border-bottom: 1px solid #101010;
+  padding: 20px 0;
+}
+
+.client {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  color: #666;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding-right: 24px;
+}
+.client:not(:last-child)::after {
+  content: "·";
+  padding-left: 24px;
+  color: #191919;
+}
+
+.copy {
+  font-size: 17px;
+  line-height: 1.7;
+  color: #808080;
+  max-width: 600px;
+  margin-bottom: 40px;
+}
+
+.bullets {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.bullets li {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  padding-left: 20px;
+  position: relative;
+}
+.bullets li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: #262626;
+}
+
+@keyframes maskIn {
+  from { -webkit-mask-position: 0% 0;   mask-position: 0% 0; }
+  to   { -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+}
+
+@keyframes maskOut {
+  from { -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+  to   { -webkit-mask-position: 0% 0;   mask-position: 0% 0; }
+}
