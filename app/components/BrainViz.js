@@ -77,6 +77,18 @@ const CLUSTER = {
   sprout: 5,
 };
 
+// One accent colour per cluster — matches the hover palette used across the site
+const CLUSTER_COLORS = [
+  new THREE.Color(232/255, 168/255,  94/255), // 0 AI/ML      — amber
+  new THREE.Color( 94/255, 200/255, 170/255), // 1 Embedded   — teal
+  new THREE.Color(120/255, 175/255, 235/255), // 2 Cloud       — blue
+  new THREE.Color(160/255, 190/255, 230/255), // 3 Web         — periwinkle
+  new THREE.Color(130/255, 210/255, 170/255), // 4 Projects    — green
+  new THREE.Color(190/255, 160/255, 230/255), // 5 Leadership  — lavender
+];
+function cCol(nodeId)    { return CLUSTER_COLORS[CLUSTER[nodeId]] || new THREE.Color(0.5,0.5,0.5); }
+function cRgb(c)         { return `${Math.round(c.r*255)},${Math.round(c.g*255)},${Math.round(c.b*255)}`; }
+
 const NODE_INFO = {
   ai:        { title:"AI / ML Systems",       body:"Edge deployment, RAG pipelines, model training and feature engineering across multiple shipped products." },
   asl:       { title:"ASL Translator",        body:"Real-time sign language → speech using MediaPipe hand tracking + TensorFlow Lite, deployed on Raspberry Pi.", stack:"Python · MediaPipe · TF Lite · RPi" },
@@ -148,8 +160,8 @@ export default function BrainViz({ onSproutClick }) {
 
     /* ── Core group — shifted right + up to stay above gradient ── */
     const coreGroup = new THREE.Group();
-    coreGroup.position.x = 1.6;
-    coreGroup.position.y = 0.5;
+    coreGroup.position.x = 2.8;
+    coreGroup.position.y = -0.4;
     scene.add(coreGroup);
 
     /* ── Modal ── */
@@ -247,7 +259,7 @@ export default function BrainViz({ onSproutClick }) {
     const geosToDispose    = [];
 
     /* ── Crisp text sprite ── */
-    function makeSprite(label, isMain) {
+    function makeSprite(label, isMain, nodeId) {
       const lw = isMain ? 210 : 148, lh = isMain ? 38 : 26;
       const cv = document.createElement("canvas");
       cv.width  = lw * DPR;
@@ -298,7 +310,7 @@ export default function BrainViz({ onSproutClick }) {
       hitMeshes.push({ mesh: dot, nodeId: n.id });
       if (n.main) mainDotMats.push({ mat, idx: NODES.indexOf(n) });
 
-      const spr = makeSprite(n.label, n.main);
+      const spr = makeSprite(n.label, n.main, n.id);
       spr.position.set(p.x + 0.07, p.y + (n.main ? 0.088 : 0.062), p.z);
       coreGroup.add(spr);
       nodeSprites[n.id] = spr;
@@ -346,18 +358,19 @@ export default function BrainViz({ onSproutClick }) {
       const fp    = new THREE.Vector3(...from.pos);
       const tp    = new THREE.Vector3(...to.pos);
       const cross = CLUSTER[a] !== CLUSTER[b];
-      const color   = cross ? 0x303030 : 0x3a3a3a;
+      const edgeBaseCol = new THREE.Color(cross ? 0x303030 : 0x3a3a3a);
       const opacity = cross ? 0.32 : 0.50;
+      const hotColor = new THREE.Color(0.70, 0.70, 0.70);
 
       const pts = cross
         ? (() => { const m = fp.clone().lerp(tp, 0.5); m.z += 0.22; return new THREE.QuadraticBezierCurve3(fp, m, tp).getPoints(24); })()
         : (() => { const steps = 8; const arr = []; for (let i=0;i<=steps;i++) arr.push(fp.clone().lerp(tp, i/steps)); return arr; })();
 
       const geo = new THREE.BufferGeometry().setFromPoints(pts);
-      const mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity, depthWrite: false });
+      const mat = new THREE.LineBasicMaterial({ color: edgeBaseCol, transparent: true, opacity, depthWrite: false });
       coreGroup.add(new THREE.Line(geo, mat));
       geosToDispose.push({ geo, mat });
-      edgeLineMats.push({ mat, baseOpacity: opacity, baseColor: new THREE.Color(color), cross, hoverT: 0, pts });
+      edgeLineMats.push({ mat, baseOpacity: opacity, baseColor: edgeBaseCol.clone(), cross, hoverT: 0, pts, hotColor });
 
       // Only animate ~55% of edges
       if (edgeIdx % 2 === 0 || cross) {
@@ -584,7 +597,7 @@ export default function BrainViz({ onSproutClick }) {
         entry.hoverT += (target - entry.hoverT) * 0.18;
         entry.currentBase = entry.baseOpacity + entry.hoverT * 0.42;
         entry.mat.opacity = entry.currentBase;
-        entry.mat.color.lerpColors(entry.baseColor, HOT_EDGE, entry.hoverT * 0.65);
+        entry.mat.color.lerpColors(entry.baseColor, entry.hotColor, entry.hoverT * 0.65);
       });
 
       mainDotMats.forEach(({ mat, idx }) => {

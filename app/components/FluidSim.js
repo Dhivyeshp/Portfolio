@@ -73,18 +73,27 @@ void main(){
   o = vec4(texture(u_tgt,v_uv).rgb + exp(-dot(p,p)/radius)*color, 1.);
 }`;
 
-/* Display — normalises colour so edges fade to transparent, never dark */
+/* Display — iridescent: hue-shifts by UV position for soap-bubble shimmer */
 const DISPLAY = `#version 300 es
 precision highp float;
 in vec2 v_uv;
 uniform sampler2D u_dye;
 uniform float u_alpha_scale, u_alpha_max;
 out vec4 o;
+
+vec3 hueShift(vec3 col, float h) {
+  vec3 k = vec3(0.57735);
+  float c = cos(h), s = sin(h);
+  return col*c + cross(k,col)*s + k*dot(k,col)*(1.0-c);
+}
+
 void main(){
   vec3 c = texture(u_dye, v_uv).rgb;
   float intensity = max(c.r, max(c.g, c.b));
-  // Normalise so the hue is always vivid — edges go transparent, not dark
   vec3 col = intensity > 0.001 ? c / intensity : vec3(0.0);
+  // Iridescent: shift hue based on position + local intensity (oil-slick / soap-bubble)
+  float shift = v_uv.x * 3.14159 * 2.0 + v_uv.y * 2.7 + intensity * 5.0;
+  col = hueShift(col, shift);
   float a = smoothstep(0.04, 0.30, intensity);
   a = a * u_alpha_scale;
   a = clamp(a, 0.0, u_alpha_max);
@@ -170,7 +179,7 @@ export default function FluidSim({ glass = false }) {
     };
 
     /* SIM low for perf (velocity/pressure), DYE mid for visual quality */
-    const SIM = 128, DYE = 512;
+    const SIM = 64, DYE = 256;
     const velocity = ping(gl, SIM, SIM);
     const pressure = ping(gl, SIM, SIM);
     const dye      = ping(gl, DYE, DYE);
@@ -239,16 +248,14 @@ export default function FluidSim({ glass = false }) {
         const dvx = (mx - pmx) * 80;
         const dvy = (my - pmy) * 80;
         if (glass) {
-          /* Glass: near-white with faint cool tint — shimmer on dark bg */
-          hue = (hue + Math.hypot(dvx, dvy) * 0.04) % 1.0;
-          const mappedHue = 0.57 + hue * 0.08; // barely shifts, stays icy blue-white
-          const [r, g, b] = hsl(mappedHue, 0.10, 0.92);
+          /* Glass: full-spectrum iridescent shimmer on dark bg */
+          hue = (hue + Math.hypot(dvx, dvy) * 0.08) % 1.0;
+          const [r, g, b] = hsl(hue, 0.85, 0.70);
           splat(mx, my, dvx, dvy, r, g, b);
         } else {
-          /* Exp-inspired pastels: soft green(0.39)→teal(0.53)→blue(0.61)→lavender(0.75) */
+          /* Full-spectrum iridescent: cycles all hues, high saturation */
           hue = (hue + Math.hypot(dvx, dvy) * 0.18) % 1.0;
-          const mappedHue = 0.39 + hue * 0.36; // 140°→270° green→lavender
-          const [r, g, b] = hsl(mappedHue, 0.55, 0.62);
+          const [r, g, b] = hsl(hue, 0.95, 0.58);
           splat(mx, my, dvx, dvy, r, g, b);
         }
         hasMoved = false;
@@ -270,7 +277,7 @@ export default function FluidSim({ glass = false }) {
       });
 
       /* pressure jacobi */
-      for (let i = 0; i < 15; i++) {
+      for (let i = 0; i < 8; i++) {
         pass(pPressure, pressure.write.f, SIM, SIM, () => {
           bind(gl,0,pressure.read.t); bind(gl,1,divT);
           gl.uniform1i(u(gl,pPressure,"u_p"),0); gl.uniform1i(u(gl,pPressure,"u_div"),1);

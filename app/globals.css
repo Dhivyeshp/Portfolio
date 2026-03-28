@@ -142,6 +142,11 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
 .hero-canvas {
   position: absolute;
   inset: 0;
+  z-index: 1;
+}
+
+/* Hero background photo — sits behind canvas and gradients */
+.hero > div:first-child {
   z-index: 0;
 }
 
@@ -162,12 +167,12 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   content: "";
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  height: 65%;
+  height: 8%;
   background: linear-gradient(
     to top,
     rgba(4,4,4,1)    0%,
-    rgba(4,4,4,0.88) 30%,
-    rgba(4,4,4,0.55) 60%,
+    rgba(4,4,4,0.88) 40%,
+    rgba(4,4,4,0.55) 70%,
     transparent      100%
   );
   z-index: 1;
@@ -289,6 +294,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   text-transform: uppercase;
   color: var(--gray-6);
   margin-bottom: 48px;
+  display: inline-block;
 }
 
 /* ── Halftone accent — full section overlay ─────────── */

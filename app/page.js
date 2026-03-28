@@ -2,14 +2,12 @@
 
 import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import GSAPPreloader from "./components/Preloader";
 
 const BrainViz = dynamic(() => import("./components/BrainViz"), {
-  ssr: false,
-  loading: () => null,
-});
-
-const FluidSim = dynamic(() => import("./components/FluidSim"), {
   ssr: false,
   loading: () => null,
 });
@@ -18,6 +16,7 @@ const DallasHalftone = dynamic(() => import("./components/DallasHalftone"), {
   ssr: false,
   loading: () => null,
 });
+
 import SproutOverlay from "./components/SproutOverlay";
 
 
@@ -29,9 +28,9 @@ const navLinks = [
 ];
 
 const stats = [
-  { value: "14+",    label: "products shipped" },
-  { value: "300+",   label: "beta users" },
-  { value: "1,500+", label: "students mentored" },
+  { value: "14+",    label: "products shipped",   raw: 14,   suffix: "+" },
+  { value: "300+",   label: "beta users",          raw: 300,  suffix: "+" },
+  { value: "1,500+", label: "students mentored",   raw: 1500, suffix: "+" },
 ];
 
 const experience = [
@@ -357,7 +356,7 @@ function makeLerpHook(selector, getAccentColor, titleSelector, extraEffect) {
         raf = requestAnimationFrame(tick);
         items.forEach((el, i) => {
           const s = state[i];
-          s.t += (s.target - s.t) * 0.05;
+          s.t += (s.target - s.t) * 0.14;
           el.style.setProperty("--hover-t", s.t);
           const title = el.querySelector(titleSelector);
           if (title) title.style.color = lerpColor(getAccentColor(i, "base"), getAccentColor(i, "accent"), s.t);
@@ -405,8 +404,8 @@ function useWorkHover() {
       raf = requestAnimationFrame(tick);
       cards.forEach((el, i) => {
         const s = state[i];
-        s.t      += (s.target - s.t)      * 0.14; // fast — bg + github
-        s.tTitle += (s.target - s.tTitle) * 0.05; // slow — title, matches exp
+        s.t      += (s.target - s.t)      * 0.18; // bg + github
+        s.tTitle += (s.target - s.tTitle) * 0.14; // title
         el.style.setProperty("--hover-t", s.t);
         const accent = WORK_ACCENT[i] ?? WORK_BASE;
         const title = el.querySelector(".work-h3");
@@ -504,16 +503,189 @@ function useActiveSection() {
   return active;
 }
 
+/* ── Hero title — per-character animated spans ───────── */
+function HeroTitle() {
+  const lines = ["Hey, I\u2019m Dhivyesh", "Prithiviraj."];
+  return (
+    <h1 className="hero-h1" style={{ perspective: "600px" }}>
+      {lines.map((line, li) => (
+        <span key={li} style={{ display: "block" }}>
+          {line.split("").map((ch, ci) => (
+            <span
+              key={ci}
+              className="hero-h1-char"
+              style={{ display: "inline-block", whiteSpace: "pre" }}
+            >
+              {ch}
+            </span>
+          ))}
+        </span>
+      ))}
+    </h1>
+  );
+}
+
+/* ── GSAP scroll animations ─────────────────────────── */
+
+function useGSAPAnimations() {
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Set initial hidden states — covered by preloader during setup
+    gsap.set(".hero-label, .hero-sub", { opacity: 0, y: 14 });
+    gsap.set(".hero-h1-char", { opacity: 0, y: 28, rotateX: -60, transformOrigin: "50% 100%" });
+    gsap.set(".section-label",    { clipPath: "inset(0 100% 0 0)" });
+    gsap.set(".about-body",       { opacity: 0, y: 20 });
+    gsap.set(".about-photo-wrap", { clipPath: "inset(100% 0 0 0)", opacity: 0 });
+    gsap.set(".exp-item",         { opacity: 0, x: -28, y: 6 });
+    gsap.set(".phil-item",        { opacity: 0, x: -20 });
+    gsap.set(".work-card",        { opacity: 0, y: 32, scale: 0.96 });
+    gsap.set(".stack-cloud",      { opacity: 0, y: 24 });
+    gsap.set(".contact-copy, .contact-email, .contact-links", { opacity: 0, y: 18 });
+
+    const ctx = gsap.context(() => {
+
+      // ── Hero parallax (scrub) ──────────────────────
+      gsap.to(".hero-content", {
+        y: -90,
+        opacity: 0,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".hero",
+          start: "top top",
+          end: "bottom top",
+          scrub: 0.9,
+        },
+      });
+
+      // ── Section labels — wipe left→right ──────────
+      document.querySelectorAll(".section-label").forEach((el) => {
+        gsap.to(el, {
+          clipPath: "inset(0 0% 0 0)",
+          duration: 0.7,
+          ease: "power3.out",
+          scrollTrigger: { trigger: el, start: "top 88%" },
+        });
+      });
+
+      // ── About text ────────────────────────────────
+      document.querySelectorAll(".about-body").forEach((el, i) => {
+        gsap.to(el, {
+          opacity: 1, y: 0,
+          duration: 0.6,
+          delay: i * 0.1,
+          ease: "power3.out",
+          scrollTrigger: { trigger: el, start: "top 90%" },
+        });
+      });
+
+      // About photo — curtain up
+      const photo = document.querySelector(".about-photo-wrap");
+      if (photo) {
+        gsap.to(photo, {
+          clipPath: "inset(0% 0 0 0)", opacity: 1,
+          duration: 0.85,
+          ease: "power3.out",
+          scrollTrigger: { trigger: photo, start: "top 88%" },
+        });
+      }
+
+      // ── Experience items ──────────────────────────
+      document.querySelectorAll(".exp-item").forEach((el, i) => {
+        gsap.to(el, {
+          opacity: 1, x: 0, y: 0,
+          duration: 0.5,
+          delay: i * 0.055,
+          ease: "power3.out",
+          scrollTrigger: { trigger: el, start: "top 89%" },
+        });
+      });
+
+      // ── Philosophy items ──────────────────────────
+      document.querySelectorAll(".phil-item").forEach((el, i) => {
+        gsap.to(el, {
+          opacity: 1, x: 0,
+          duration: 0.48,
+          delay: i * 0.05,
+          ease: "power3.out",
+          scrollTrigger: { trigger: el, start: "top 89%" },
+        });
+      });
+
+      // ── Work cards ────────────────────────────────
+      document.querySelectorAll(".work-card").forEach((el, i) => {
+        gsap.to(el, {
+          opacity: 1, y: 0, scale: 1,
+          duration: 0.55,
+          delay: (i % 2) * 0.09,
+          ease: "power3.out",
+          scrollTrigger: { trigger: el, start: "top 91%" },
+        });
+      });
+
+      // ── Stack cloud ───────────────────────────────
+      const cloud = document.querySelector(".stack-cloud");
+      if (cloud) {
+        gsap.to(cloud, {
+          opacity: 1, y: 0,
+          duration: 0.65,
+          ease: "power3.out",
+          scrollTrigger: { trigger: cloud, start: "top 86%" },
+        });
+      }
+
+      // ── Contact ───────────────────────────────────
+      document.querySelectorAll(".contact-copy, .contact-email, .contact-links").forEach((el, i) => {
+        gsap.to(el, {
+          opacity: 1, y: 0,
+          duration: 0.52,
+          delay: i * 0.09,
+          ease: "power3.out",
+          scrollTrigger: { trigger: el, start: "top 88%" },
+        });
+      });
+    });
+
+    return () => ctx.revert();
+  }, []);
+}
+
+/* ── CountUp ────────────────────────────────────────── */
+
+function CountUp({ to, suffix = "", delay = 0 }) {
+  const [val, setVal] = useState(0);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    let raf;
+    const t = setTimeout(() => {
+      const duration = 1000;
+      const start = performance.now();
+      const tick = (now) => {
+        const p = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        setVal(Math.round(eased * to));
+        if (p < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    }, delay);
+    return () => { clearTimeout(t); cancelAnimationFrame(raf); };
+  }, [to, delay]);
+
+  return <span ref={ref}>{val >= 1000 ? val.toLocaleString() : val}{suffix}</span>;
+}
+
 /* ── Variants ───────────────────────────────────────── */
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  show:   { opacity: 1, y: 0,  transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+  hidden: { opacity: 0, y: 12 },
+  show:   { opacity: 1, y: 0,  transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] } },
 };
 const stagger = {
   hidden: {},
-  show:   { transition: { staggerChildren: 0.07 } },
+  show:   { transition: { staggerChildren: 0.04 } },
 };
+
 
 /* ── Page ───────────────────────────────────────────── */
 
@@ -529,15 +701,39 @@ export default function Page() {
   const [preview, setPreview] = useState(null);
   const [sproutOpen, setSproutOpen] = useState(false);
   const [sproutOrigin, setSproutOrigin] = useState(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useGSAPAnimations();
+
+  // Hero text zoom-in — fires the moment preloader hands off
+  useEffect(() => {
+    if (!loaded) return;
+    gsap.fromTo(
+      ".hero-label",
+      { opacity: 0, y: 14, filter: "blur(4px)" },
+      { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.75, ease: "power3.out", delay: 0.05 }
+    );
+    gsap.fromTo(
+      ".hero-h1-char",
+      { opacity: 0, y: 28, rotateX: -60, transformOrigin: "50% 100%" },
+      { opacity: 1, y: 0, rotateX: 0, duration: 0.6, stagger: 0.028, ease: "power3.out", delay: 0.18 }
+    );
+    gsap.fromTo(
+      ".hero-sub",
+      { opacity: 0, y: 14, filter: "blur(4px)" },
+      { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.75, ease: "power3.out", delay: 0.85 }
+    );
+  }, [loaded]);
 
   return (
     <>
+      {!loaded && <GSAPPreloader onComplete={() => setLoaded(true)} />}
       {/* ── Nav (transparent over hero) ── */}
       <motion.nav
         className={`site-nav${scrolled ? " scrolled" : ""}`}
         initial={{ y: -64, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 1.0, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.6, delay: 0, ease: [0.22, 1, 0.36, 1] }}
       >
         <span className="nav-brand">Dhivyesh</span>
         <div className="nav-links">
@@ -553,74 +749,67 @@ export default function Page() {
       </motion.nav>
 
 
-      {/* ── Full-screen hero with 3D background ── */}
+      {/* ── Full-screen hero ── */}
       <section className="hero" style={{ position: "relative" }}>
-        {/* Glass fluid sim — white shimmer, behind everything */}
-        <FluidSim glass />
+
+        {/* Radial gradient — focal glow centred on hero text */}
+        <div style={{
+          position: "absolute", inset: 0, zIndex: 2, pointerEvents: "none",
+          background: "radial-gradient(ellipse 55% 65% at 28% 52%, rgba(255, 255, 255, 0.01) 0%, rgba(255,255,255,0.018) 38%, transparent 72%)",
+        }} />
+
+        {/* Halftone background — same image as preloader's last frame for seamless handoff */}
+        <div style={{ position: "absolute", inset: 0, zIndex: 0, overflow: "hidden" }}>
+          <img
+            src="/images/halftone.png"
+            alt=""
+            style={{
+              width: "100%", height: "100%",
+              objectFit: "cover", objectPosition: "center center",
+              display: "block",
+              opacity: 0.58,
+            }}
+          />
+          {/* Dark overlay so the neural network stays visible */}
+          <div style={{ position: "absolute", inset: 0, background: "rgba(4,4,4,0.72)" }} />
+          {/* Fade top edge into dark background */}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, #040404 0%, rgba(4,4,4,0.6) 18%, transparent 150%)" }} />
+        </div>
+
         {/* 3D canvas fills entire hero */}
         <motion.div
           className="hero-canvas"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.8, delay: 1.4, ease: [0.22, 1, 0.36, 1] }}
+          animate={{ opacity: loaded ? 1 : 0 }}
+          transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
         >
           <BrainViz onSproutClick={(pos) => { setSproutOrigin(pos); setSproutOpen(true); }} />
         </motion.div>
-        <motion.div className="ht" initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} transition={{ delay: 1.2, duration: 3, ease: [0.22,1,0.36,1] }}>
-          <DallasHalftone variant="hero" />
-        </motion.div>
 
-
-        {/* Text overlaid at bottom */}
-        <motion.div
-          className="hero-content"
-          initial="hidden"
-          animate="show"
-          variants={stagger}
-        >
-          <motion.p className="hero-label" variants={fadeUp}>
-            Computer Engineering @ UT Dallas
-          </motion.p>
-          <motion.h1 className="hero-h1" variants={fadeUp}>
-            Hey, I'm Dhivyesh<br />Prithiviraj.
-          </motion.h1>
-          <motion.p className="hero-sub" variants={fadeUp}>
-            Always building, always iterating.
-          </motion.p>
-          <motion.div className="hero-stats" variants={fadeUp}>
-            {stats.map((s) => (
-              <div className="hero-stat" key={s.label}>
-                <strong>{s.value}</strong>
-                <span>{s.label}</span>
-              </div>
-            ))}
-          </motion.div>
-        </motion.div>
+{/* Hero text — GSAP zoom-in fires when preloader completes */}
+        <div className="hero-content">
+          <p className="hero-label">Computer Engineering @ UT Dallas</p>
+          <HeroTitle />
+          <p className="hero-sub">Always building, always iterating.</p>
+        </div>
 
         {/* Scroll cue */}
         <motion.div
           className="scroll-cue"
           initial={{ opacity: 0 }}
           animate={{ opacity: scrolled ? 0 : 1 }}
-          transition={{ delay: scrolled ? 0 : 2, duration: 0.6 }}
+          transition={{ delay: scrolled ? 0 : 1.2, duration: 0.6 }}
         >
           <span>scroll</span>
           <div className="scroll-line" />
         </motion.div>
       </section>
 
-      {/* ── Scrollable content ── */}
       <div className="page">
 
         {/* ── About ── */}
-        <motion.section
-          className="about-section"
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: false, amount: 0.3 }}
-          variants={stagger}
-        >
-          <motion.div className="about-text" variants={fadeUp}>
+        <section className="about-section">
+          <div className="about-text">
             <p className="section-label">About</p>
             <p className="about-body">
               I got into programming in high school building chatbots and automation tools, and that curiosity quickly turned into a drive to build software people actually use. At UT Dallas, I've expanded into full stack, machine learning, and cloud engineering, building production systems like a React Native app serving 300+ users at NRVE and ACM's event platform that onboarded hundreds.
@@ -631,27 +820,20 @@ export default function Page() {
             <p className="about-body">
               Across everything I build, from ASL to speech to AI systems, I focus on creating fast, scalable solutions that actually matter.
             </p>
-          </motion.div>
-          <motion.div className="about-photo-wrap" variants={fadeUp}>
+          </div>
+          <div className="about-photo-wrap">
             <img src="/images/headshot.JPG" alt="Dhivyesh Prithiviraj" className="about-photo" />
-          </motion.div>
-        </motion.section>
+          </div>
+        </section>
 
-        <motion.section
-          id="experience"
-          className="section exp-section"
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: false, amount: 0.2 }}
-          variants={stagger}
-        >
-          <motion.div className="ht" initial={{ opacity: 0 }} whileInView={{ opacity: 0.01 }} viewport={{ once: false }} transition={{ duration: 2.5, ease: [0.22,1,0.36,0.5] }}>
+        <section id="experience" className="section exp-section">
+          <div className="ht" style={{ opacity: 0.01 }}>
             <DallasHalftone variant="reunion" />
-          </motion.div>
-          <motion.p className="section-label" variants={fadeUp}>Experience</motion.p>
+          </div>
+          <p className="section-label">Experience</p>
           <div className="exp-list">
-            {experience.map((item) => (
-              <motion.div className="exp-item" key={item.company} variants={fadeUp}>
+            {experience.map((item, i) => (
+              <div className="exp-item" key={item.company}>
                 <div className="exp-top">
                   <div>
                     <p className="exp-company">{item.company}{item.location && <span className="exp-location"> · {item.location}</span>}</p>
@@ -669,53 +851,37 @@ export default function Page() {
                     {item.points.map((pt) => <li key={pt}>{pt}</li>)}
                   </ul>
                 )}
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.section>
+        </section>
 
-        <motion.section
-          id="philosophy"
-          className="section"
-          style={{ position: "relative", overflow: "visible" }}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: false, amount: 0.2 }}
-          variants={stagger}
-        >
-          <motion.div className="ht" initial={{ opacity: 0 }} whileInView={{ opacity: 0.032 }} viewport={{ once: false }} transition={{ duration: 2.5, ease: [0.22,1,0.36,1] }}>
+        <section id="philosophy" className="section" style={{ position: "relative", overflow: "visible" }}>
+          <div className="ht" style={{ opacity: 0.032 }}>
             <DallasHalftone variant="bofa" />
-          </motion.div>
-          <motion.p className="section-label" variants={fadeUp}>Philosophy</motion.p>
+          </div>
+          <p className="section-label">Philosophy</p>
           <div className="phil-list">
             {philosophy.map((item) => (
-              <motion.div className="phil-item" key={item.number} variants={fadeUp}>
+              <div className="phil-item" key={item.number}>
                 <span className="phil-num">{item.number}</span>
                 <div className="phil-body">
                   <h3>{item.title}</h3>
                   <p>{item.body}</p>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.section>
+        </section>
 
-        <motion.section
-          id="work"
-          className="section"
-          style={{ position: "relative", overflow: "visible" }}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: false, amount: 0.15 }}
-          variants={stagger}
-        >
-          <motion.div className="ht" initial={{ opacity: 0 }} whileInView={{ opacity: 0.02 }} viewport={{ once: false }} transition={{ duration: 2.5, ease: [0.22,1,0.36,1] }}>
+        <section id="work" className="section" style={{ position: "relative", overflow: "visible" }}>
+          <div className="ht" style={{ opacity: 0.02 }}>
             <DallasHalftone variant="atandt" />
-          </motion.div>
-          <motion.p className="section-label" variants={fadeUp}>Work</motion.p>
+          </div>
+          <p className="section-label">Work</p>
           <div className="work-grid">
             {projects.map((p) => (
-              <motion.div className="work-card" key={p.code} variants={fadeUp} style={{ "--accent": p.accent }}>
+              <div className="work-card" key={p.code} style={{ "--accent": p.accent }}>
                 <div className="work-card-body">
                   <div className="work-meta">
                     <span className="work-code">[{p.code}]</span>
@@ -732,64 +898,49 @@ export default function Page() {
                   )}
                 </div>
                 <div className="work-accent-line" />
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.section>
+        </section>
 
-        <motion.section
-          className="section"
-          style={{ position: "relative", overflow: "visible" }}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: false, amount: 0.15 }}
-          variants={stagger}
-        >
-          <motion.div className="ht" initial={{ opacity: 0.1 }} whileInView={{ opacity: 0.01 }} viewport={{ once: false }} transition={{ duration: 2.5, ease: [0.22,1,0.36,0.5] }}>
+        <section className="section" style={{ position: "relative", overflow: "visible" }}>
+          <div className="ht" style={{ opacity: 0.01 }}>
             <DallasHalftone variant="right" />
-          </motion.div>
-          <motion.p className="section-label" variants={fadeUp}>Stack</motion.p>
-          <motion.div className="stack-cloud" variants={fadeUp}>
+          </div>
+          <p className="section-label">Stack</p>
+          <div className="stack-cloud">
             {capabilities.map((c) => (
               <span key={c.label} className="stack-word" style={{ fontSize: `${c.size}px`, opacity: c.opacity, fontWeight: c.weight }}>
                 {c.label}
               </span>
             ))}
-          </motion.div>
-        </motion.section>
+          </div>
+        </section>
 
-        <motion.section
-          id="contact"
-          className="contact-section"
-          style={{ position: "relative", overflow: "visible" }}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: false, amount: 0.2 }}
-          variants={stagger}
-        >
-          <motion.div className="ht" initial={{ opacity: 0.1 }} whileInView={{ opacity: 0.07 }} viewport={{ once: false }} transition={{ duration: 2.5, ease: [0.22,1,0.36,1] }}>
+        <section id="contact" className="contact-section" style={{ position: "relative", overflow: "visible" }}>
+          <div className="ht" style={{ opacity: 0.07 }}>
             <DallasHalftone variant="mirror" />
-          </motion.div>
-          <motion.p className="section-label" variants={fadeUp}>Contact</motion.p>
-          <motion.p className="contact-copy" variants={fadeUp}>
+          </div>
+          <p className="section-label">Contact</p>
+          <p className="contact-copy">
             Open to internships, product teams, and ambitious software work. If you are building
             something thoughtful and need a developer who cares about both craft and execution,
             let&apos;s talk.
-          </motion.p>
-          <motion.a className="contact-email" href="mailto:dhivyeshrathi@gmail.com" variants={fadeUp}>
+          </p>
+          <a className="contact-email" href="mailto:dhivyeshrathi@gmail.com">
             dhivyeshrathi@gmail.com
-          </motion.a>
-          <motion.div className="contact-links" variants={fadeUp}>
+          </a>
+          <div className="contact-links">
             {socialLinks.map((l) => (
               <a key={l.href} href={l.href} className="slide-link" target="_blank" rel="noreferrer">
                 <span>{l.label}</span>
                 <span>{l.label}</span>
               </a>
             ))}
-          </motion.div>
-        </motion.section>
+          </div>
+        </section>
 
-        <footer className="site-footer">
+<footer className="site-footer">
           <span>Dhivyesh Prithiviraj — {new Date().getFullYear()}</span>
           <span>Dallas, TX</span>
         </footer>
