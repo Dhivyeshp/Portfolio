@@ -14,21 +14,39 @@ const LOGOS = [
   "/images/logos/faze.jpg",
 ];
 
-const PX_PER_SEC = 40; // pixels per second — lower = slower
+const PX_PER_SEC = 40; // pixels per second - lower = slower
 
 export default function LogoMarquee() {
   const trackRef = useRef(null);
-  const xRef     = useRef(0);
-  const rafRef   = useRef(null);
-  const lastRef  = useRef(null);
+  const loopWRef = useRef(0);
+  const xRef = useRef(0);
+  const rafRef = useRef(null);
+  const lastRef = useRef(null);
   const pauseRef = useRef(false);
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
 
-    // Half the track is the "real" set — loop when we've scrolled that far
-    const getHalfW = () => track.scrollWidth / 2;
+    const updateLoopW = () => {
+      const secondSetFirst = track.children[LOGOS.length];
+      loopWRef.current = secondSetFirst instanceof HTMLElement
+        ? secondSetFirst.offsetLeft
+        : track.scrollWidth / 2;
+    };
+
+    updateLoopW();
+
+    const ro = new ResizeObserver(updateLoopW);
+    ro.observe(track);
+
+    const images = Array.from(track.querySelectorAll("img"));
+    images.forEach((img) => {
+      if (!img.complete) {
+        img.addEventListener("load", updateLoopW);
+        img.addEventListener("error", updateLoopW);
+      }
+    });
 
     const tick = (now) => {
       if (lastRef.current == null) lastRef.current = now;
@@ -36,17 +54,26 @@ export default function LogoMarquee() {
       lastRef.current = now;
 
       if (!pauseRef.current) {
-        xRef.current += PX_PER_SEC * dt;
-        const half = getHalfW();
-        if (xRef.current >= half) xRef.current -= half;
-        track.style.transform = `translateX(${-xRef.current}px)`;
+        const loopW = loopWRef.current;
+        if (loopW > 0) {
+          xRef.current = (xRef.current + PX_PER_SEC * dt) % loopW;
+          track.style.transform = `translate3d(${-xRef.current}px, 0, 0)`;
+        }
       }
 
       rafRef.current = requestAnimationFrame(tick);
     };
 
     rafRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafRef.current);
+
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      ro.disconnect();
+      images.forEach((img) => {
+        img.removeEventListener("load", updateLoopW);
+        img.removeEventListener("error", updateLoopW);
+      });
+    };
   }, []);
 
   return (

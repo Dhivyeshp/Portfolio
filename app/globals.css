@@ -131,6 +131,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
 /* ── Hero — full-screen canvas ──────────────────────── */
 
 .hero {
+  --hero-fade: 1;
   position: relative;
   width: 100%;
   height: 100vh;
@@ -142,6 +143,16 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   z-index: 1;
 }
 
+.hero-fade-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: var(--hero-fade);
+}
+
 /* 3D canvas fills entire hero */
 .hero-canvas {
   position: absolute;
@@ -150,7 +161,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
 }
 
 /* Hero background photo — sits behind canvas and gradients */
-.hero > div:first-child {
+.hero-bg {
   z-index: 0;
 }
 
@@ -163,6 +174,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   height: 160px;
   background: linear-gradient(to bottom, rgba(4,4,4,0.55) 0%, transparent 100%);
   z-index: 1;
+  opacity: var(--hero-fade);
   pointer-events: none;
 }
 
@@ -180,6 +192,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
     transparent      100%
   );
   z-index: 1;
+  opacity: var(--hero-fade);
   pointer-events: none;
 }
 
@@ -279,16 +292,20 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
 
 .about-statement {
   position: relative;
-  background: #040404;
+  z-index: 2;
+  background: #efefef;
+  border-radius: 20px;
+  margin: 0 12px;
   padding: 100px 0 140px;
   overflow: hidden;
+  cursor: none;
 }
 
 /* About text lines */
 .about-lines {
   max-width: 960px;
   margin: 0 auto;
-  padding: 0 48px;
+  padding: 0;
 }
 .about-line {
   position: relative;
@@ -301,12 +318,12 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
 }
 .about-line-gray {
   display: block;
-  color: #2a2a2a;
+  color: #c4c4c4;
 }
 .about-line-white {
   position: absolute;
   inset: 0;
-  color: #f0f0f0;
+  color: #111111;
   pointer-events: none;
   display: block;
 }
@@ -314,10 +331,24 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
 .about-float-card-wrap {
   position: absolute;
   right: max(48px, calc(50% - 550px + 48px));
-  bottom: 60px;
+  bottom: 116px;
   width: 280px;
   height: 360px;
   z-index: 2;
+  transition: filter 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  filter: drop-shadow(0 18px 28px rgba(0,0,0,0.12));
+}
+.about-float-card-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 18px 22px -18px;
+  border-radius: 24px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.08) 45%, transparent 75%);
+  filter: blur(20px);
+  opacity: 0.55;
+  transform: translateY(0) scale(1);
+  transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: -1;
 }
 .about-float-card {
   display: block;
@@ -326,39 +357,55 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   border-radius: 16px;
   overflow: hidden;
   text-decoration: none;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.52);
   cursor: none;
-  transition: box-shadow 0.35s ease;
+  background: #dcdcdc;
+  transform: translateY(0) scale(1);
+  transform-origin: center center;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.55s ease, border-color 0.55s ease;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.07);
+  will-change: transform, box-shadow;
 }
-.about-float-card:hover {
-  box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+.about-float-card-wrap:hover {
+  filter: drop-shadow(0 24px 38px rgba(0,0,0,0.16));
+}
+.about-float-card-wrap:hover::before {
+  opacity: 0.72;
+  transform: translateY(6px) scale(1.02);
+}
+.about-float-card-wrap:hover .about-float-card {
+  transform: translateY(-4px) scale(1.006);
+  box-shadow: 0 18px 34px rgba(0,0,0,0.12);
+  border-color: rgba(255,255,255,0.75);
 }
 .about-float-img {
   width: 100%; height: 100%;
   object-fit: cover; display: block;
+  transform: scale(1);
+  transform-origin: center center;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.55s ease;
+  will-change: transform;
+}
+.about-float-card-wrap:hover .about-float-img {
+  transform: scale(1.02);
+  filter: saturate(1.02) contrast(1.03);
 }
 .about-float-label {
   position: absolute;
   bottom: 14px; left: 12px; right: 12px;
   display: flex;
   align-items: center;
-  gap: 7px;
-  color: rgba(255,255,255,0.88);
+  justify-content: center;
+  color: rgba(255,255,255,0.9);
   font-size: 11px;
   font-family: var(--font-mono, monospace);
   letter-spacing: 0.06em;
-  background: rgba(20,20,20,0.55);
+  background: rgba(18,18,18,0.46);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 8px;
   padding: 8px 12px;
-}
-.about-float-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: #4ade80;
-  flex-shrink: 0;
 }
 
 /* Custom "About me" cursor */
@@ -367,10 +414,10 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   top: 0; left: 0;
   width: 110px; height: 110px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.1);
+  background: rgba(20,20,20,0.08);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(20,20,20,0.12);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -388,7 +435,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   font-family: var(--font-mono, monospace);
   font-size: 10px;
   letter-spacing: 0.1em;
-  color: rgba(255,255,255,0.85);
+  color: rgba(20,20,20,0.74);
   text-transform: uppercase;
   text-align: center;
   line-height: 1.4;
@@ -520,6 +567,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
 .lm-logo:hover            { opacity: 0.9 !important; filter: grayscale(0) !important; }
 /* ACM logo is white — invert to black */
 .lm-logo[src*="acm"]      { filter: grayscale(1) invert(1); }
+.lm-outer:hover .lm-logo[src*="acm"] { filter: grayscale(1) invert(1); }
 .lm-logo[src*="acm"]:hover { filter: grayscale(0) invert(1) !important; }
 
 /* ── About ──────────────────────────────────────────── */
@@ -1290,11 +1338,33 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
 
 /* ── Card base ── */
 .ap-card {
+  --ap-delay: 0ms;
   background: #0d0d0d;
   border: 1px solid #1a1a1a;
   border-radius: 18px;
   padding: 22px;
   overflow: hidden;
+  opacity: 0;
+  transform: translateY(22px);
+  animation: ap-card-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--ap-delay);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+  will-change: transform, opacity;
+}
+.ap-card:hover {
+  transform: translateY(-4px);
+  border-color: #252525;
+  box-shadow: 0 16px 34px rgba(0,0,0,0.24);
+}
+@keyframes ap-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .ap-card-tag {
@@ -1342,6 +1412,11 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   object-fit: cover;
   object-position: center top;
   display: block;
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), filter 0.45s ease;
+}
+.ap-card--photo:hover .ap-card-photo {
+  transform: scale(1.03);
+  filter: saturate(1.04) contrast(1.03);
 }
 .ap-photo-clock {
   position: absolute;
@@ -1401,6 +1476,8 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  min-height: 150px;
+  padding: 18px 20px;
 }
 .ap-status-row {
   display: flex;
@@ -1409,11 +1486,21 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   margin-bottom: 10px;
 }
 .ap-status-dot {
+  position: relative;
   width: 7px; height: 7px;
   border-radius: 50%;
   background: #4ade80;
   box-shadow: 0 0 8px #4ade8088;
   flex-shrink: 0;
+  animation: ap-status-pulse 1.8s ease-in-out infinite;
+}
+.ap-status-dot::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  animation: ap-status-ring 1.8s ease-out infinite;
 }
 .ap-status-text {
   font-size: 14px;
@@ -1432,6 +1519,8 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  min-height: 150px;
+  padding: 18px 20px;
 }
 .ap-edu-school {
   font-size: 18px;
@@ -1470,12 +1559,32 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   justify-content: center;
   position: relative;
 }
+.ap-music-orbit {
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.08);
+  animation: ap-orbit-spin 7s linear infinite;
+}
+.ap-music-orbit-dot {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f5f5f5, #8b8b8b);
+  box-shadow: 0 0 16px rgba(255,255,255,0.22);
+}
 .ap-music-vinyl {
   width: 40%;
   height: 40%;
   border-radius: 50%;
   background: #0a0a0a;
   border: 3px solid #1e1e1e;
+  box-shadow: inset 0 0 0 10px rgba(255,255,255,0.03);
+  animation: ap-vinyl-spin 9s linear infinite;
 }
 .ap-music-info { text-align: center; }
 .ap-music-artist {
@@ -1534,6 +1643,23 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   from { transform: scaleY(0.3); opacity: 0.5; }
   to   { transform: scaleY(1);   opacity: 1; }
 }
+@keyframes ap-status-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.18); opacity: 0.9; }
+}
+@keyframes ap-status-ring {
+  0% { transform: scale(0.7); opacity: 0.55; }
+  70% { transform: scale(1.35); opacity: 0; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+@keyframes ap-orbit-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes ap-vinyl-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 
 /* ── Tools I love ── */
 .ap-card--tools { grid-area: tools; }
@@ -1557,9 +1683,9 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition: border-color 0.2s, background 0.2s;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s, background 0.2s;
 }
-.ap-tool-icon:hover { background: #222; border-color: #333; }
+.ap-tool-icon:hover { background: #222; border-color: #333; transform: translateY(-2px); }
 .ap-tool-icon img {
   width: 28px;
   height: 28px;
@@ -1590,9 +1716,9 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   border: 1px solid #1e1e1e;
   border-radius: 100px;
   padding: 8px 16px;
-  transition: border-color 0.2s;
+  transition: transform 0.25s ease, border-color 0.2s;
 }
-.ap-fav-item:hover { border-color: #333; }
+.ap-fav-item:hover { border-color: #333; transform: translateY(-1px); }
 .ap-fav-emoji { font-size: 16px; line-height: 1; }
 .ap-fav-label { font-size: 13px; color: var(--gray-8); }
 
@@ -1603,9 +1729,9 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   font-size: 14px;
   color: var(--gray-7);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color 0.2s, transform 0.25s ease;
 }
-.ap-connect-link:hover { color: var(--gray-12); }
+.ap-connect-link:hover { color: var(--gray-12); transform: translateX(3px); }
 
 /* ── Footer ── */
 .ap-footer {
@@ -1641,5 +1767,5 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   .ap-footer { padding: 8px 16px 60px; }
   .about-lines { padding: 0 20px; }
   .about-line  { font-size: clamp(28px, 7vw, 48px); }
-  .about-float-card-wrap { right: 20px; bottom: 40px; width: 200px; height: 260px; }
+  .about-float-card-wrap { right: 20px; bottom: 84px; width: 200px; height: 260px; }
 }

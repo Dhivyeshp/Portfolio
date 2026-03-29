@@ -5,7 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import GSAPPreloader from "./components/Preloader";
 
 const BrainViz = dynamic(() => import("./components/BrainViz"), {
@@ -578,12 +578,22 @@ function useGSAPAnimations() {
       // ── Hero parallax (scrub) ──────────────────────
       gsap.to(".hero-content", {
         y: -90,
-        opacity: 0,
         ease: "none",
         scrollTrigger: {
           trigger: ".hero",
           start: "top top",
           end: "bottom top",
+          scrub: 0.9,
+        },
+      });
+
+      gsap.to(".hero", {
+        "--hero-fade": 0,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".hero",
+          start: "top top",
+          end: "70% top",
           scrub: 0.9,
         },
       });
@@ -691,32 +701,32 @@ function AboutStatement() {
     offset: ["start 80%", "end 15%"],
   });
   // One spring on the raw progress — all 6 lines share the same easing
-  const sp = useSpring(scrollYProgress, { stiffness: 32, damping: 26 });
+  const sp = useSpring(scrollYProgress, { stiffness: 58, damping: 22 });
 
   // 6 lines, each filling sequentially across the scroll range
-  const p0 = useTransform(sp, [0.00, 0.16], [100, 0], { clamp: true });
+  const p0 = useTransform(sp, [0.00, 0.08], [100, 0], { clamp: true });
   const c0 = useTransform(p0, (v) => `inset(0 ${v}% 0 0)`);
-  const p1 = useTransform(sp, [0.17, 0.33], [100, 0], { clamp: true });
+  const p1 = useTransform(sp, [0.085, 0.165], [100, 0], { clamp: true });
   const c1 = useTransform(p1, (v) => `inset(0 ${v}% 0 0)`);
-  const p2 = useTransform(sp, [0.34, 0.50], [100, 0], { clamp: true });
+  const p2 = useTransform(sp, [0.17, 0.25], [100, 0], { clamp: true });
   const c2 = useTransform(p2, (v) => `inset(0 ${v}% 0 0)`);
-  const p3 = useTransform(sp, [0.51, 0.67], [100, 0], { clamp: true });
+  const p3 = useTransform(sp, [0.255, 0.335], [100, 0], { clamp: true });
   const c3 = useTransform(p3, (v) => `inset(0 ${v}% 0 0)`);
-  const p4 = useTransform(sp, [0.68, 0.84], [100, 0], { clamp: true });
+  const p4 = useTransform(sp, [0.34, 0.42], [100, 0], { clamp: true });
   const c4 = useTransform(p4, (v) => `inset(0 ${v}% 0 0)`);
-  const p5 = useTransform(sp, [0.85, 1.00], [100, 0], { clamp: true });
+  const p5 = useTransform(sp, [0.425, 0.505], [100, 0], { clamp: true });
   const c5 = useTransform(p5, (v) => `inset(0 ${v}% 0 0)`);
 
   const lineClips = [c0, c1, c2, c3, c4, c5];
 
   // card parallax — slides up as section scrolls into view
-  const cardRawY = useTransform(scrollYProgress, [0, 1], [60, -40]);
+  const cardRawY = useTransform(scrollYProgress, [0, 1], [82, -82]);
   const cardY = useSpring(cardRawY, { stiffness: 50, damping: 18 });
 
   useEffect(() => {
     const cursor = cursorRef.current;
-    const card   = sectionRef.current?.querySelector(".about-float-card-wrap");
-    if (!cursor || !card) return;
+    const section = sectionRef.current;
+    if (!cursor || !section) return;
 
     const onMove = (e) => { mouseRef.current = { x: e.clientX, y: e.clientY }; };
 
@@ -731,15 +741,15 @@ function AboutStatement() {
     const onLeave = () => cursor.classList.remove("about-cursor--visible");
 
     window.addEventListener("mousemove", onMove);
-    card.addEventListener("mouseenter", onEnter);
-    card.addEventListener("mouseleave", onLeave);
+    section.addEventListener("mouseenter", onEnter);
+    section.addEventListener("mouseleave", onLeave);
     rafRef.current = requestAnimationFrame(tick);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener("mousemove", onMove);
-      card.removeEventListener("mouseenter", onEnter);
-      card.removeEventListener("mouseleave", onLeave);
+      section.removeEventListener("mouseenter", onEnter);
+      section.removeEventListener("mouseleave", onLeave);
     };
   }, []);
 
@@ -760,6 +770,9 @@ function AboutStatement() {
       <motion.div style={{ y: cardY }} className="about-float-card-wrap">
         <Link href="/about" className="about-float-card">
           <img src="/images/preloader/IMG_1129.JPG" alt="" className="about-float-img" />
+          <div className="about-float-label">
+            <span>Lake Travis August 5th 2025</span>
+          </div>
         </Link>
       </motion.div>
 
@@ -858,6 +871,7 @@ export default function Page() {
 
       {/* ── Full-screen hero ── */}
       <section className="hero">
+        <div className="hero-fade-wrap">
 
         {/* Radial gradient — focal glow centred on hero text */}
         <div style={{
@@ -866,7 +880,7 @@ export default function Page() {
         }} />
 
         {/* Halftone background — same image as preloader's last frame for seamless handoff */}
-        <div style={{ position: "absolute", inset: 0, zIndex: 0, overflow: "hidden" }}>
+        <div className="hero-bg" style={{ position: "absolute", inset: 0, zIndex: 0, overflow: "hidden" }}>
           <img
             src="/images/halftone.png"
             alt=""
@@ -910,6 +924,7 @@ export default function Page() {
           <span>scroll</span>
           <div className="scroll-line" />
         </motion.div>
+        </div>
       </section>
 
       {/* ── About statement — dark, full bleed ── */}
