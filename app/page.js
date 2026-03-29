@@ -1,10 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
+import { AnimatePresence, motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import GSAPPreloader from "./components/Preloader";
 
 const BrainViz = dynamic(() => import("./components/BrainViz"), {
@@ -18,6 +19,7 @@ const DallasHalftone = dynamic(() => import("./components/DallasHalftone"), {
 });
 
 import SproutOverlay from "./components/SproutOverlay";
+import LogoMarquee from "./components/LogoMarquee";
 
 
 /* ── Data ──────────────────────────────────────────── */
@@ -485,6 +487,7 @@ function useStackHover() {
   }, []);
 }
 
+
 function useActiveSection() {
   const [active, setActive] = useState("");
   useEffect(() => {
@@ -501,6 +504,41 @@ function useActiveSection() {
     return () => obs.forEach((o) => o?.disconnect());
   }, []);
   return active;
+}
+
+/* ── Email — per-character 3D hover ─────────────────── */
+const EMAIL = "dhivyeshrathi@gmail.com";
+
+function EmailChars() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const chars = Array.from(el.querySelectorAll(".email-char"));
+    const onEnter = () => gsap.to(chars, {
+      keyframes: [
+        { rotateX: 180, filter: "blur(2px)", duration: 0.2, ease: "power2.in"  },
+        { rotateX: 360, filter: "blur(0px)", duration: 0.2, ease: "power2.out" },
+      ],
+      stagger: 0.022, overwrite: true,
+    });
+    const onLeave = () => gsap.to(chars,
+      { rotateX: 0, filter: "blur(0px)", duration: 0.3, stagger: 0.018, ease: "power2.out", overwrite: true }
+    );
+    el.addEventListener("mouseenter", onEnter);
+    el.addEventListener("mouseleave", onLeave);
+    return () => {
+      el.removeEventListener("mouseenter", onEnter);
+      el.removeEventListener("mouseleave", onLeave);
+    };
+  }, []);
+  return (
+    <a ref={ref} className="contact-email" href={`mailto:${EMAIL}`} style={{ perspective: "600px" }}>
+      {EMAIL.split("").map((ch, i) => (
+        <span key={i} className="email-char" style={{ display: "inline-block" }}>{ch}</span>
+      ))}
+    </a>
+  );
 }
 
 /* ── Hero title — per-character animated spans ───────── */
@@ -531,24 +569,15 @@ function useGSAPAnimations() {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
-    // Set initial hidden states — covered by preloader during setup
+    // Set initial hidden states for hero only (sections use Framer Motion)
     gsap.set(".hero-label, .hero-sub", { opacity: 0, y: 14 });
     gsap.set(".hero-h1-char", { opacity: 0, y: 28, rotateX: -60, transformOrigin: "50% 100%" });
-    gsap.set(".section-label",    { clipPath: "inset(0 100% 0 0)" });
-    gsap.set(".about-body",       { opacity: 0, y: 20 });
-    gsap.set(".about-photo-wrap", { clipPath: "inset(100% 0 0 0)", opacity: 0 });
-    gsap.set(".exp-item",         { opacity: 0, x: -28, y: 6 });
-    gsap.set(".phil-item",        { opacity: 0, x: -20 });
-    gsap.set(".work-card",        { opacity: 0, y: 32, scale: 0.96 });
-    gsap.set(".stack-cloud",      { opacity: 0, y: 24 });
-    gsap.set(".contact-copy, .contact-email, .contact-links", { opacity: 0, y: 18 });
 
     const ctx = gsap.context(() => {
 
       // ── Hero parallax (scrub) ──────────────────────
       gsap.to(".hero-content", {
         y: -90,
-        opacity: 0,
         ease: "none",
         scrollTrigger: {
           trigger: ".hero",
@@ -558,92 +587,18 @@ function useGSAPAnimations() {
         },
       });
 
-      // ── Section labels — wipe left→right ──────────
-      document.querySelectorAll(".section-label").forEach((el) => {
-        gsap.to(el, {
-          clipPath: "inset(0 0% 0 0)",
-          duration: 0.7,
-          ease: "power3.out",
-          scrollTrigger: { trigger: el, start: "top 88%" },
-        });
+      gsap.to(".hero", {
+        "--hero-fade": 0,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".hero",
+          start: "top top",
+          end: "70% top",
+          scrub: 0.9,
+        },
       });
 
-      // ── About text ────────────────────────────────
-      document.querySelectorAll(".about-body").forEach((el, i) => {
-        gsap.to(el, {
-          opacity: 1, y: 0,
-          duration: 0.6,
-          delay: i * 0.1,
-          ease: "power3.out",
-          scrollTrigger: { trigger: el, start: "top 90%" },
-        });
-      });
 
-      // About photo — curtain up
-      const photo = document.querySelector(".about-photo-wrap");
-      if (photo) {
-        gsap.to(photo, {
-          clipPath: "inset(0% 0 0 0)", opacity: 1,
-          duration: 0.85,
-          ease: "power3.out",
-          scrollTrigger: { trigger: photo, start: "top 88%" },
-        });
-      }
-
-      // ── Experience items ──────────────────────────
-      document.querySelectorAll(".exp-item").forEach((el, i) => {
-        gsap.to(el, {
-          opacity: 1, x: 0, y: 0,
-          duration: 0.5,
-          delay: i * 0.055,
-          ease: "power3.out",
-          scrollTrigger: { trigger: el, start: "top 89%" },
-        });
-      });
-
-      // ── Philosophy items ──────────────────────────
-      document.querySelectorAll(".phil-item").forEach((el, i) => {
-        gsap.to(el, {
-          opacity: 1, x: 0,
-          duration: 0.48,
-          delay: i * 0.05,
-          ease: "power3.out",
-          scrollTrigger: { trigger: el, start: "top 89%" },
-        });
-      });
-
-      // ── Work cards ────────────────────────────────
-      document.querySelectorAll(".work-card").forEach((el, i) => {
-        gsap.to(el, {
-          opacity: 1, y: 0, scale: 1,
-          duration: 0.55,
-          delay: (i % 2) * 0.09,
-          ease: "power3.out",
-          scrollTrigger: { trigger: el, start: "top 91%" },
-        });
-      });
-
-      // ── Stack cloud ───────────────────────────────
-      const cloud = document.querySelector(".stack-cloud");
-      if (cloud) {
-        gsap.to(cloud, {
-          opacity: 1, y: 0,
-          duration: 0.65,
-          ease: "power3.out",
-          scrollTrigger: { trigger: cloud, start: "top 86%" },
-        });
-      }
-
-      // ── Contact ───────────────────────────────────
-      document.querySelectorAll(".contact-copy, .contact-email, .contact-links").forEach((el, i) => {
-        gsap.to(el, {
-          opacity: 1, y: 0,
-          duration: 0.52,
-          delay: i * 0.09,
-          ease: "power3.out",
-          scrollTrigger: { trigger: el, start: "top 88%" },
-        });
-      });
     });
 
     return () => ctx.revert();
@@ -677,15 +632,157 @@ function CountUp({ to, suffix = "", delay = 0 }) {
 
 /* ── Variants ───────────────────────────────────────── */
 
+const ease = [0.22, 1, 0.36, 1];
+
 const fadeUp = {
   hidden: { opacity: 0, y: 12 },
-  show:   { opacity: 1, y: 0,  transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] } },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.32, ease } },
 };
 const stagger = {
   hidden: {},
   show:   { transition: { staggerChildren: 0.04 } },
 };
 
+// Section label wipe
+const labelWipe = {
+  hidden: { clipPath: "inset(0 100% 0 0)" },
+  show:   { clipPath: "inset(0 0% 0 0)", transition: { duration: 0.65, ease } },
+};
+
+// About
+// Experience
+const expList = { hidden: {}, show: { transition: { staggerChildren: 0.07 } } };
+const expItem = {
+  hidden: { opacity: 0, x: -28, y: 6 },
+  show:   { opacity: 1, x: 0, y: 0, transition: { duration: 0.5, ease } },
+};
+
+// Philosophy
+const philList = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } };
+const philItem = {
+  hidden: { opacity: 0, x: -20 },
+  show:   { opacity: 1, x: 0, transition: { duration: 0.48, ease } },
+};
+
+// Work
+const workGrid = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
+const workCard = {
+  hidden: { opacity: 0, y: 32, scale: 0.96 },
+  show:   { opacity: 1, y: 0, scale: 1, transition: { duration: 0.55, ease } },
+};
+
+// Stack + Contact
+const fadeSlide = {
+  hidden: { opacity: 0, y: 24 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.6, ease } },
+};
+
+
+/* ── About statement — scroll text fill + cursor ────── */
+
+const ABOUT_LINES = [
+  "I build things",
+  "that feel intentional.",
+  "Software systems.",
+  "Brand experiences.",
+  "Work that people",
+  "actually remember.",
+];
+
+function AboutStatement() {
+  const sectionRef  = useRef(null);
+  const cursorRef   = useRef(null);
+  const rafRef      = useRef(null);
+  const mouseRef    = useRef({ x: 0, y: 0 });
+  const posRef      = useRef({ x: 0, y: 0 });
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start 80%", "end 15%"],
+  });
+  // One spring on the raw progress — all 6 lines share the same easing
+  const sp = useSpring(scrollYProgress, { stiffness: 58, damping: 22 });
+
+  // 6 lines, each filling sequentially across the scroll range
+  const p0 = useTransform(sp, [0.00, 0.08], [100, 0], { clamp: true });
+  const c0 = useTransform(p0, (v) => `inset(0 ${v}% 0 0)`);
+  const p1 = useTransform(sp, [0.085, 0.165], [100, 0], { clamp: true });
+  const c1 = useTransform(p1, (v) => `inset(0 ${v}% 0 0)`);
+  const p2 = useTransform(sp, [0.17, 0.25], [100, 0], { clamp: true });
+  const c2 = useTransform(p2, (v) => `inset(0 ${v}% 0 0)`);
+  const p3 = useTransform(sp, [0.255, 0.335], [100, 0], { clamp: true });
+  const c3 = useTransform(p3, (v) => `inset(0 ${v}% 0 0)`);
+  const p4 = useTransform(sp, [0.34, 0.42], [100, 0], { clamp: true });
+  const c4 = useTransform(p4, (v) => `inset(0 ${v}% 0 0)`);
+  const p5 = useTransform(sp, [0.425, 0.505], [100, 0], { clamp: true });
+  const c5 = useTransform(p5, (v) => `inset(0 ${v}% 0 0)`);
+
+  const lineClips = [c0, c1, c2, c3, c4, c5];
+
+  // card parallax — slides up as section scrolls into view
+  const cardRawY = useTransform(scrollYProgress, [0, 1], [82, -82]);
+  const cardY = useSpring(cardRawY, { stiffness: 50, damping: 18 });
+
+  useEffect(() => {
+    const cursor = cursorRef.current;
+    const section = sectionRef.current;
+    if (!cursor || !section) return;
+
+    const onMove = (e) => { mouseRef.current = { x: e.clientX, y: e.clientY }; };
+
+    const tick = () => {
+      posRef.current.x += (mouseRef.current.x - posRef.current.x) * 0.12;
+      posRef.current.y += (mouseRef.current.y - posRef.current.y) * 0.12;
+      cursor.style.transform = `translate(${posRef.current.x}px,${posRef.current.y}px) translate(-50%,-50%)`;
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    const onEnter = () => cursor.classList.add("about-cursor--visible");
+    const onLeave = () => cursor.classList.remove("about-cursor--visible");
+
+    window.addEventListener("mousemove", onMove);
+    section.addEventListener("mouseenter", onEnter);
+    section.addEventListener("mouseleave", onLeave);
+    rafRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      window.removeEventListener("mousemove", onMove);
+      section.removeEventListener("mouseenter", onEnter);
+      section.removeEventListener("mouseleave", onLeave);
+    };
+  }, []);
+
+  return (
+    <section className="about-statement" ref={sectionRef}>
+      <div className="about-lines">
+        {ABOUT_LINES.map((line, i) => (
+          <div key={i} className="about-line">
+            <span className="about-line-gray">{line}</span>
+            <motion.span className="about-line-white" style={{ clipPath: lineClips[i] }}>
+              {line}
+            </motion.span>
+          </div>
+        ))}
+      </div>
+
+      {/* Floating card — parallax upward on scroll */}
+      <motion.div style={{ y: cardY }} className="about-float-card-wrap">
+        <Link href="/about" className="about-float-card">
+          <img src="/images/preloader/IMG_1129.JPG" alt="" className="about-float-img" />
+          <div className="about-float-label">
+            <span>Lake Travis August 5th 2025</span>
+          </div>
+        </Link>
+      </motion.div>
+
+      {/* Custom cursor */}
+      <div ref={cursorRef} className="about-cursor" aria-hidden>
+        <span>About me</span>
+      </div>
+    </section>
+  );
+}
 
 /* ── Page ───────────────────────────────────────────── */
 
@@ -696,6 +793,29 @@ export default function Page() {
   useNavLetterHover();
   useExpHover();
   usePhilHover();
+  useEffect(() => {
+    const items = document.querySelectorAll(".phil-item");
+    const handlers = Array.from(items).map((item) => {
+      const chars = Array.from(item.querySelectorAll(".phil-title-char"));
+      const onEnter = () => gsap.to(chars, {
+        keyframes: [
+          { rotateX: 180, filter: "blur(2px)", duration: 0.2, ease: "power2.in"  },
+          { rotateX: 360, filter: "blur(0px)", duration: 0.2, ease: "power2.out" },
+        ],
+        stagger: 0.035, overwrite: true,
+      });
+      const onLeave = () => gsap.to(chars,
+        { rotateX: 0, filter: "blur(0px)", duration: 0.3, stagger: 0.025, ease: "power2.out", overwrite: true }
+      );
+      item.addEventListener("mouseenter", onEnter);
+      item.addEventListener("mouseleave", onLeave);
+      return { item, onEnter, onLeave };
+    });
+    return () => handlers.forEach(({ item, onEnter, onLeave }) => {
+      item.removeEventListener("mouseenter", onEnter);
+      item.removeEventListener("mouseleave", onLeave);
+    });
+  }, []);
   useWorkHover();
   useStackHover();
   const [preview, setPreview] = useState(null);
@@ -750,7 +870,8 @@ export default function Page() {
 
 
       {/* ── Full-screen hero ── */}
-      <section className="hero" style={{ position: "relative" }}>
+      <section className="hero">
+        <div className="hero-fade-wrap">
 
         {/* Radial gradient — focal glow centred on hero text */}
         <div style={{
@@ -759,7 +880,7 @@ export default function Page() {
         }} />
 
         {/* Halftone background — same image as preloader's last frame for seamless handoff */}
-        <div style={{ position: "absolute", inset: 0, zIndex: 0, overflow: "hidden" }}>
+        <div className="hero-bg" style={{ position: "absolute", inset: 0, zIndex: 0, overflow: "hidden" }}>
           <img
             src="/images/halftone.png"
             alt=""
@@ -803,37 +924,35 @@ export default function Page() {
           <span>scroll</span>
           <div className="scroll-line" />
         </motion.div>
+        </div>
       </section>
 
-      <div className="page">
+      {/* ── About statement — dark, full bleed ── */}
+      <AboutStatement />
 
-        {/* ── About ── */}
-        <section className="about-section">
-          <div className="about-text">
-            <p className="section-label">About</p>
-            <p className="about-body">
-              I got into programming in high school building chatbots and automation tools, and that curiosity quickly turned into a drive to build software people actually use. At UT Dallas, I've expanded into full stack, machine learning, and cloud engineering, building production systems like a React Native app serving 300+ users at NRVE and ACM's event platform that onboarded hundreds.
-            </p>
-            <p className="about-body">
-              I've also worked on physics informed ML models in the Reliability and Design Automation Lab and apply my CE background through Formula Racing, contributing to powertrain and system design. Outside the classroom, I'm a Marketing Lead for HackUTD and run Sprout Designs, where I've built digital experiences and branding for clients like OpTic Gaming, FaZe Clan, and the Miami Dolphins.
-            </p>
-            <p className="about-body">
-              Across everything I build, from ASL to speech to AI systems, I focus on creating fast, scalable solutions that actually matter.
-            </p>
+      {/* ── White card — collab carousel only ── */}
+      <div className="content-sheet">
+        <div className="collab-wrap">
+          <div className="collab-header">
+            <p className="collab-title">Collaborations</p>
+            <p className="collab-sub">From startups to student orgs to global brands</p>
           </div>
-          <div className="about-photo-wrap">
-            <img src="/images/headshot.JPG" alt="Dhivyesh Prithiviraj" className="about-photo" />
-          </div>
-        </section>
+          <LogoMarquee />
+        </div>
+      </div>
+
+      {/* ── Dark sections ── */}
+      <div className="dark-wrap">
+      <div className="page">
 
         <section id="experience" className="section exp-section">
           <div className="ht" style={{ opacity: 0.01 }}>
             <DallasHalftone variant="reunion" />
           </div>
-          <p className="section-label">Experience</p>
-          <div className="exp-list">
+          <motion.p className="section-label" variants={labelWipe} initial="hidden" whileInView="show" viewport={{ once: false, margin: "-8%" }}>Experience</motion.p>
+          <motion.div className="exp-list" variants={expList} initial="hidden" whileInView="show" viewport={{ once: false, margin: "-5%" }}>
             {experience.map((item, i) => (
-              <div className="exp-item" key={item.company}>
+              <motion.div className="exp-item" variants={expItem} key={item.company}>
                 <div className="exp-top">
                   <div>
                     <p className="exp-company">{item.company}{item.location && <span className="exp-location"> · {item.location}</span>}</p>
@@ -851,37 +970,41 @@ export default function Page() {
                     {item.points.map((pt) => <li key={pt}>{pt}</li>)}
                   </ul>
                 )}
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </section>
 
         <section id="philosophy" className="section" style={{ position: "relative", overflow: "visible" }}>
           <div className="ht" style={{ opacity: 0.032 }}>
             <DallasHalftone variant="bofa" />
           </div>
-          <p className="section-label">Philosophy</p>
-          <div className="phil-list">
+          <motion.p className="section-label" variants={labelWipe} initial="hidden" whileInView="show" viewport={{ once: false, margin: "-8%" }}>Philosophy</motion.p>
+          <motion.div className="phil-list" variants={philList} initial="hidden" whileInView="show" viewport={{ once: false, margin: "-5%" }}>
             {philosophy.map((item) => (
-              <div className="phil-item" key={item.number}>
+              <motion.div className="phil-item" variants={philItem} key={item.number}>
                 <span className="phil-num">{item.number}</span>
                 <div className="phil-body">
-                  <h3>{item.title}</h3>
+                  <h3 style={{ perspective: "600px" }}>
+                    {item.title.split("").map((ch, ci) => (
+                      <span key={ci} className="phil-title-char" style={{ display: "inline-block", whiteSpace: "pre" }}>{ch}</span>
+                    ))}
+                  </h3>
                   <p>{item.body}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </section>
 
         <section id="work" className="section" style={{ position: "relative", overflow: "visible" }}>
           <div className="ht" style={{ opacity: 0.02 }}>
             <DallasHalftone variant="atandt" />
           </div>
-          <p className="section-label">Work</p>
-          <div className="work-grid">
+          <motion.p className="section-label" variants={labelWipe} initial="hidden" whileInView="show" viewport={{ once: false, margin: "-8%" }}>Work</motion.p>
+          <motion.div className="work-grid" variants={workGrid} initial="hidden" whileInView="show" viewport={{ once: false, margin: "-5%" }}>
             {projects.map((p) => (
-              <div className="work-card" key={p.code} style={{ "--accent": p.accent }}>
+              <motion.div className="work-card" variants={workCard} key={p.code} style={{ "--accent": p.accent }}>
                 <div className="work-card-body">
                   <div className="work-meta">
                     <span className="work-code">[{p.code}]</span>
@@ -898,46 +1021,46 @@ export default function Page() {
                   )}
                 </div>
                 <div className="work-accent-line" />
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </section>
 
         <section className="section" style={{ position: "relative", overflow: "visible" }}>
           <div className="ht" style={{ opacity: 0.01 }}>
             <DallasHalftone variant="right" />
           </div>
-          <p className="section-label">Stack</p>
-          <div className="stack-cloud">
+          <motion.p className="section-label" variants={labelWipe} initial="hidden" whileInView="show" viewport={{ once: false, margin: "-8%" }}>Stack</motion.p>
+          <motion.div className="stack-cloud" variants={fadeSlide} initial="hidden" whileInView="show" viewport={{ once: false, margin: "-10%" }}>
             {capabilities.map((c) => (
               <span key={c.label} className="stack-word" style={{ fontSize: `${c.size}px`, opacity: c.opacity, fontWeight: c.weight }}>
                 {c.label}
               </span>
             ))}
-          </div>
+          </motion.div>
         </section>
 
         <section id="contact" className="contact-section" style={{ position: "relative", overflow: "visible" }}>
           <div className="ht" style={{ opacity: 0.07 }}>
             <DallasHalftone variant="mirror" />
           </div>
-          <p className="section-label">Contact</p>
-          <p className="contact-copy">
+          <motion.p className="section-label" variants={labelWipe} initial="hidden" whileInView="show" viewport={{ once: false, margin: "-8%" }}>Contact</motion.p>
+          <motion.p className="contact-copy" variants={fadeSlide} initial="hidden" whileInView="show" viewport={{ once: false, margin: "-8%" }}>
             Open to internships, product teams, and ambitious software work. If you are building
             something thoughtful and need a developer who cares about both craft and execution,
             let&apos;s talk.
-          </p>
-          <a className="contact-email" href="mailto:dhivyeshrathi@gmail.com">
-            dhivyeshrathi@gmail.com
-          </a>
-          <div className="contact-links">
+          </motion.p>
+          <motion.div variants={fadeSlide} initial="hidden" whileInView="show" viewport={{ once: false, margin: "-8%" }} transition={{ delay: 0.1 }}>
+            <EmailChars />
+          </motion.div>
+          <motion.div className="contact-links" variants={fadeSlide} initial="hidden" whileInView="show" viewport={{ once: false, margin: "-8%" }} transition={{ delay: 0.2 }}>
             {socialLinks.map((l) => (
               <a key={l.href} href={l.href} className="slide-link" target="_blank" rel="noreferrer">
                 <span>{l.label}</span>
                 <span>{l.label}</span>
               </a>
             ))}
-          </div>
+          </motion.div>
         </section>
 
 <footer className="site-footer">
@@ -945,7 +1068,8 @@ export default function Page() {
           <span>Dallas, TX</span>
         </footer>
 
-      </div>
+      </div>{/* /page */}
+      </div>{/* /dark-wrap */}
 
       {/* ── Lightbox ── */}
       <AnimatePresence>

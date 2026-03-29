@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
+    "dev:fresh": "powershell -Command \"if (Test-Path .next) { Remove-Item -Recurse -Force .next }; npx next dev\"",
     "build": "next build",
     "start": "next start",
     "clean": "powershell -Command \"if (Test-Path .next) { Remove-Item -Recurse -Force .next }\""
