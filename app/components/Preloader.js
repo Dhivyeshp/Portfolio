@@ -5,9 +5,9 @@ import { gsap } from "gsap";
 
 // Last image MUST be the hero background photo — it stays on screen as the hero reveals
 const IMAGES = [
-  "/images/race1.png",
-  "/images/vertera1.png",
-  "/images/seatswap1.png",
+  "/images/preloader/DSC09828.JPG",
+  "/images/preloader/IMG_1129.JPG",
+  "/images/preloader/IMG_9323.JPG",
   "/images/halftone.png",   // ← expands to fill viewport, becomes hero bg
 ];
 

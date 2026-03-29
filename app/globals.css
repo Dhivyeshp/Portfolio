@@ -128,7 +128,8 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
 /* ── Hero — full-screen canvas ──────────────────────── */
 
 .hero {
-  position: relative;
+  position: sticky;
+  top: 0;
   width: 100%;
   height: 100vh;
   min-height: 580px;
@@ -136,6 +137,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   display: flex;
   flex-direction: column;
   justify-content: center;
+  z-index: 1;
 }
 
 /* 3D canvas fills entire hero */
@@ -271,6 +273,39 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   50%       { transform: scaleX(0.3); opacity: 0.9; }
 }
 
+/* ── Content sheet — slides up over dark hero ────────── */
+
+.content-sheet {
+  position: relative;
+  z-index: 2;
+  background: #f5f4f0;
+  border-radius: 20px 20px 0 0;
+  margin-top: 0;
+  box-shadow: 0 -8px 48px rgba(0,0,0,0.35);
+
+  /* Invert the gray scale so all var(--gray-X) usage flips to dark-on-light */
+  --gray-1:  #f5f4f0;
+  --gray-2:  #eceae6;
+  --gray-3:  #dedad5;
+  --gray-4:  #cac7c1;
+  --gray-5:  #b0ada6;
+  --gray-6:  #888480;
+  --gray-7:  #666360;
+  --gray-8:  #4c4946;
+  --gray-9:  #363330;
+  --gray-10: #252220;
+  --gray-11: #161412;
+  --gray-12: #0c0a08;
+}
+
+/* ── Dark sections wrapper ───────────────────────────── */
+
+.dark-wrap {
+  position: relative;
+  z-index: 3;
+  background: #040404;
+}
+
 /* ── Page (scrollable content) ──────────────────────── */
 
 .page {
@@ -306,10 +341,88 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   overflow:       hidden;
 }
 
+/* ── Collaborations carousel ────────────────────────── */
+
+.collab-wrap {
+  padding: 32px 0 80px;
+  border-top: 1px solid var(--gray-3);
+}
+
+.collab-header {
+  max-width: 960px;
+  margin: 0 auto 56px;
+  padding: 0 32px;
+}
+
+.collab-title {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gray-6);
+  margin-bottom: 4px;
+}
+
+.collab-sub {
+  font-size: 13px;
+  color: var(--gray-8);
+}
+
+.lm-outer {
+  overflow: hidden;
+  position: relative;
+  cursor: default;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+.lm-outer::before,
+.lm-outer::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 100px;
+  z-index: 2;
+  pointer-events: none;
+}
+.lm-outer::before {
+  left: 0;
+  background: linear-gradient(to right, var(--gray-1), transparent);
+}
+.lm-outer::after {
+  right: 0;
+  background: linear-gradient(to left, var(--gray-1), transparent);
+}
+.lm-track {
+  display: flex;
+  align-items: center;
+  gap: 72px;
+  width: max-content;
+  will-change: transform;
+  padding: 8px 0;
+}
+.lm-logo {
+  height: 44px;
+  width: auto;
+  max-width: 130px;
+  object-fit: contain;
+  opacity: 0.4;
+  filter: grayscale(1);
+  transition: opacity 0.25s ease, filter 0.25s ease;
+  flex-shrink: 0;
+}
+.lm-outer:hover .lm-logo { opacity: 0.35; filter: grayscale(1); }
+.lm-logo:hover            { opacity: 0.9 !important; filter: grayscale(0) !important; }
+/* ACM logo is white — invert to black */
+.lm-logo[src*="acm"]      { filter: grayscale(1) invert(1); }
+.lm-logo[src*="acm"]:hover { filter: grayscale(0) invert(1) !important; }
+
 /* ── About ──────────────────────────────────────────── */
 
 .about-section {
-  padding: 96px 0 80px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 96px 32px 80px;
   display: flex;
   align-items: flex-start;
   gap: 64px;
@@ -506,6 +619,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   letter-spacing: -0.02em;
   color: var(--phil-title-color, var(--gray-11));
   margin-bottom: 5px;
+  position: relative;
 }
 .phil-body p { font-size: 13px; line-height: 1.6; color: var(--gray-6); }
 
@@ -530,7 +644,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(255,255,255,0.05);
+  background: rgba(0,0,0,0.04);
   opacity: var(--hover-t);
   pointer-events: none;
   z-index: 0;
@@ -665,6 +779,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   transition: border-color 0.2s ease;
 }
 .contact-email:hover { border-color: var(--gray-9); }
+.email-char, .phil-title-char { will-change: transform; }
 
 .contact-links { display: flex; gap: 22px; flex-wrap: wrap; }
 

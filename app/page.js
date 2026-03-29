@@ -18,6 +18,7 @@ const DallasHalftone = dynamic(() => import("./components/DallasHalftone"), {
 });
 
 import SproutOverlay from "./components/SproutOverlay";
+import LogoMarquee from "./components/LogoMarquee";
 
 
 /* ── Data ──────────────────────────────────────────── */
@@ -503,6 +504,41 @@ function useActiveSection() {
   return active;
 }
 
+/* ── Email — per-character 3D hover ─────────────────── */
+const EMAIL = "dhivyeshrathi@gmail.com";
+
+function EmailChars() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const chars = Array.from(el.querySelectorAll(".email-char"));
+    const onEnter = () => gsap.to(chars, {
+      keyframes: [
+        { rotateX: 180, filter: "blur(2px)", duration: 0.2, ease: "power2.in"  },
+        { rotateX: 360, filter: "blur(0px)", duration: 0.2, ease: "power2.out" },
+      ],
+      stagger: 0.022, overwrite: true,
+    });
+    const onLeave = () => gsap.to(chars,
+      { rotateX: 0, filter: "blur(0px)", duration: 0.3, stagger: 0.018, ease: "power2.out", overwrite: true }
+    );
+    el.addEventListener("mouseenter", onEnter);
+    el.addEventListener("mouseleave", onLeave);
+    return () => {
+      el.removeEventListener("mouseenter", onEnter);
+      el.removeEventListener("mouseleave", onLeave);
+    };
+  }, []);
+  return (
+    <a ref={ref} className="contact-email" href={`mailto:${EMAIL}`} style={{ perspective: "600px" }}>
+      {EMAIL.split("").map((ch, i) => (
+        <span key={i} className="email-char" style={{ display: "inline-block" }}>{ch}</span>
+      ))}
+    </a>
+  );
+}
+
 /* ── Hero title — per-character animated spans ───────── */
 function HeroTitle() {
   const lines = ["Hey, I\u2019m Dhivyesh", "Prithiviraj."];
@@ -557,6 +593,7 @@ function useGSAPAnimations() {
           scrub: 0.9,
         },
       });
+
 
       // ── Section labels — wipe left→right ──────────
       document.querySelectorAll(".section-label").forEach((el) => {
@@ -696,6 +733,29 @@ export default function Page() {
   useNavLetterHover();
   useExpHover();
   usePhilHover();
+  useEffect(() => {
+    const items = document.querySelectorAll(".phil-item");
+    const handlers = Array.from(items).map((item) => {
+      const chars = Array.from(item.querySelectorAll(".phil-title-char"));
+      const onEnter = () => gsap.to(chars, {
+        keyframes: [
+          { rotateX: 180, filter: "blur(2px)", duration: 0.2, ease: "power2.in"  },
+          { rotateX: 360, filter: "blur(0px)", duration: 0.2, ease: "power2.out" },
+        ],
+        stagger: 0.035, overwrite: true,
+      });
+      const onLeave = () => gsap.to(chars,
+        { rotateX: 0, filter: "blur(0px)", duration: 0.3, stagger: 0.025, ease: "power2.out", overwrite: true }
+      );
+      item.addEventListener("mouseenter", onEnter);
+      item.addEventListener("mouseleave", onLeave);
+      return { item, onEnter, onLeave };
+    });
+    return () => handlers.forEach(({ item, onEnter, onLeave }) => {
+      item.removeEventListener("mouseenter", onEnter);
+      item.removeEventListener("mouseleave", onLeave);
+    });
+  }, []);
   useWorkHover();
   useStackHover();
   const [preview, setPreview] = useState(null);
@@ -750,7 +810,7 @@ export default function Page() {
 
 
       {/* ── Full-screen hero ── */}
-      <section className="hero" style={{ position: "relative" }}>
+      <section className="hero">
 
         {/* Radial gradient — focal glow centred on hero text */}
         <div style={{
@@ -805,9 +865,8 @@ export default function Page() {
         </motion.div>
       </section>
 
-      <div className="page">
-
-        {/* ── About ── */}
+      {/* ── White about card ── */}
+      <div className="content-sheet">
         <section className="about-section">
           <div className="about-text">
             <p className="section-label">About</p>
@@ -825,6 +884,20 @@ export default function Page() {
             <img src="/images/headshot.JPG" alt="Dhivyesh Prithiviraj" className="about-photo" />
           </div>
         </section>
+
+        {/* ── Logo carousel ── */}
+        <div className="collab-wrap">
+          <div className="collab-header">
+            <p className="collab-title">Collaborations</p>
+            <p className="collab-sub">From startups to student orgs to global brands</p>
+          </div>
+          <LogoMarquee />
+        </div>
+      </div>{/* /content-sheet */}
+
+      {/* ── Dark sections ── */}
+      <div className="dark-wrap">
+      <div className="page">
 
         <section id="experience" className="section exp-section">
           <div className="ht" style={{ opacity: 0.01 }}>
@@ -866,7 +939,11 @@ export default function Page() {
               <div className="phil-item" key={item.number}>
                 <span className="phil-num">{item.number}</span>
                 <div className="phil-body">
-                  <h3>{item.title}</h3>
+                  <h3 style={{ perspective: "600px" }}>
+                    {item.title.split("").map((ch, ci) => (
+                      <span key={ci} className="phil-title-char" style={{ display: "inline-block", whiteSpace: "pre" }}>{ch}</span>
+                    ))}
+                  </h3>
                   <p>{item.body}</p>
                 </div>
               </div>
@@ -927,9 +1004,7 @@ export default function Page() {
             something thoughtful and need a developer who cares about both craft and execution,
             let&apos;s talk.
           </p>
-          <a className="contact-email" href="mailto:dhivyeshrathi@gmail.com">
-            dhivyeshrathi@gmail.com
-          </a>
+          <EmailChars />
           <div className="contact-links">
             {socialLinks.map((l) => (
               <a key={l.href} href={l.href} className="slide-link" target="_blank" rel="noreferrer">
@@ -945,7 +1020,8 @@ export default function Page() {
           <span>Dallas, TX</span>
         </footer>
 
-      </div>
+      </div>{/* /page */}
+      </div>{/* /dark-wrap */}
 
       {/* ── Lightbox ── */}
       <AnimatePresence>
