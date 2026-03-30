@@ -857,7 +857,6 @@ export default function Page() {
       >
         <span className="nav-brand">Dhivyesh</span>
         <div className="nav-links">
-          <span className="nav-avail">Available for internships</span>
           {navLinks.map((l) => (
             <a key={l.href} href={l.href} className={`nav-link${active === l.href.slice(1) ? " active" : ""}`}>
               {l.label.split("").map((ch, i) => (

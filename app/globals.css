@@ -79,7 +79,7 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
 .site-nav.scrolled::after  { transform: scaleX(1); }
 
 /* Nav content must sit above ::before glass layer */
-.nav-brand, .nav-links, .nav-avail { position: relative; z-index: 1; }
+.nav-brand, .nav-links { position: relative; z-index: 1; }
 
 .nav-brand {
   font-family: var(--font-mono, monospace);
@@ -111,23 +111,6 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   65%  { transform: translateY(2px); }
   100% { transform: translateY(0); }
 }
-
-.nav-avail {
-  font-family: var(--font-mono, monospace);
-  font-size: 11px;
-  color: var(--gray-6);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.nav-avail::before {
-  content: "";
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: #4ade80;
-  display: inline-block;
-}
-
 /* ── Hero — full-screen canvas ──────────────────────── */
 
 .hero {
@@ -1015,7 +998,6 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
   .hero-content { padding-bottom: 44px; }
   .hero-h1 { font-size: clamp(28px, 9vw, 40px); }
   .hero-stats { gap: 20px; }
-  .nav-avail { display: none; }
   .work-bg-num { display: none; }
   .work-grid { grid-template-columns: 1fr; }
   .work-img-btn img { height: 210px; }
