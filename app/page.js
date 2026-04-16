@@ -1,25 +1,15 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { AnimatePresence, motion, useScroll, useTransform, useSpring } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import GSAPPreloader from "./components/Preloader";
-
-const BrainViz = dynamic(() => import("./components/BrainViz"), {
-  ssr: false,
-  loading: () => null,
-});
-
-const DallasHalftone = dynamic(() => import("./components/DallasHalftone"), {
-  ssr: false,
-  loading: () => null,
-});
-
 import SproutOverlay from "./components/SproutOverlay";
 import LogoMarquee from "./components/LogoMarquee";
+import BrainViz from "./components/BrainViz";
+import DallasHalftone from "./components/DallasHalftone";
 
 
 /* ── Data ──────────────────────────────────────────── */
@@ -304,7 +294,20 @@ function useCursor() {
 function useScrolled() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > window.innerHeight * 0.8);
+    let ticking = false;
+
+    const update = () => {
+      ticking = false;
+      setScrolled(window.scrollY > window.innerHeight * 0.8);
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(update);
+    };
+
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -566,7 +569,7 @@ function HeroTitle() {
 /* ── GSAP scroll animations ─────────────────────────── */
 
 function useGSAPAnimations() {
-  useEffect(() => {
+  useLayoutEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
     // Set initial hidden states for hero only (sections use Framer Motion)
@@ -575,28 +578,21 @@ function useGSAPAnimations() {
 
     const ctx = gsap.context(() => {
 
-      // ── Hero parallax (scrub) ──────────────────────
-      gsap.to(".hero-content", {
-        y: -90,
-        ease: "none",
+      const heroTl = gsap.timeline({
+        defaults: { ease: "none" },
         scrollTrigger: {
           trigger: ".hero",
           start: "top top",
           end: "bottom top",
-          scrub: 0.9,
+          scrub: 1.2,
+          invalidateOnRefresh: true,
         },
       });
 
-      gsap.to(".hero", {
-        "--hero-fade": 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: ".hero",
-          start: "top top",
-          end: "70% top",
-          scrub: 0.9,
-        },
-      });
+      heroTl
+        .to(".hero-content", { y: -72, force3D: true }, 0)
+        .to(".hero-fade-wrap", { opacity: 0.08, y: -20, force3D: true }, 0)
+        .to(".hero-bg", { scale: 1.035, force3D: true }, 0);
 
 
     });
@@ -701,7 +697,7 @@ function AboutStatement() {
     offset: ["start 80%", "end 15%"],
   });
   // One spring on the raw progress — all 6 lines share the same easing
-  const sp = useSpring(scrollYProgress, { stiffness: 58, damping: 22 });
+  const sp = useSpring(scrollYProgress, { stiffness: 42, damping: 24, mass: 0.6 });
 
   // 6 lines, each filling sequentially across the scroll range
   const p0 = useTransform(sp, [0.00, 0.08], [100, 0], { clamp: true });
@@ -721,7 +717,7 @@ function AboutStatement() {
 
   // card parallax — slides up as section scrolls into view
   const cardRawY = useTransform(scrollYProgress, [0, 1], [82, -82]);
-  const cardY = useSpring(cardRawY, { stiffness: 50, damping: 18 });
+  const cardY = useSpring(cardRawY, { stiffness: 38, damping: 22, mass: 0.7 });
 
   useEffect(() => {
     const cursor = cursorRef.current;
@@ -821,13 +817,14 @@ export default function Page() {
   const [preview, setPreview] = useState(null);
   const [sproutOpen, setSproutOpen] = useState(false);
   const [sproutOrigin, setSproutOrigin] = useState(null);
-  const [loaded, setLoaded] = useState(false);
+  const [heroReady, setHeroReady] = useState(false);
+  const [preloaderDone, setPreloaderDone] = useState(false);
 
   useGSAPAnimations();
 
   // Hero text zoom-in — fires the moment preloader hands off
   useEffect(() => {
-    if (!loaded) return;
+    if (!heroReady) return;
     gsap.fromTo(
       ".hero-label",
       { opacity: 0, y: 14, filter: "blur(4px)" },
@@ -843,11 +840,19 @@ export default function Page() {
       { opacity: 0, y: 14, filter: "blur(4px)" },
       { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.75, ease: "power3.out", delay: 0.85 }
     );
-  }, [loaded]);
+  }, [heroReady]);
 
   return (
     <>
-      {!loaded && <GSAPPreloader onComplete={() => setLoaded(true)} />}
+      {!preloaderDone && (
+        <GSAPPreloader
+          onHandoff={() => setHeroReady(true)}
+          onComplete={() => {
+            setHeroReady(true);
+            setPreloaderDone(true);
+          }}
+        />
+      )}
       {/* ── Nav (transparent over hero) ── */}
       <motion.nav
         className={`site-nav${scrolled ? " scrolled" : ""}`}
@@ -900,7 +905,7 @@ export default function Page() {
         <motion.div
           className="hero-canvas"
           initial={{ opacity: 0 }}
-          animate={{ opacity: loaded ? 1 : 0 }}
+          animate={{ opacity: heroReady ? 1 : 0 }}
           transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
         >
           <BrainViz onSproutClick={(pos) => { setSproutOrigin(pos); setSproutOpen(true); }} />
@@ -913,17 +918,17 @@ export default function Page() {
           <p className="hero-sub">Always building, always iterating.</p>
         </div>
 
+        </div>
         {/* Scroll cue */}
         <motion.div
           className="scroll-cue"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: scrolled ? 0 : 1 }}
-          transition={{ delay: scrolled ? 0 : 1.2, duration: 0.6 }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: scrolled ? 0 : 1, y: scrolled ? 10 : 0 }}
+          transition={{ delay: scrolled ? 0 : 1.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
           <span>scroll</span>
           <div className="scroll-line" />
         </motion.div>
-        </div>
       </section>
 
       {/* ── About statement — dark, full bleed ── */}

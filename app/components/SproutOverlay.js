@@ -2,9 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import dynamic from "next/dynamic";
-
-const FluidSim = dynamic(() => import("./FluidSim"), { ssr: false, loading: () => null });
+import FluidSim from "./FluidSim";
 
 /* ── Work data ─────────────────────────────────────────── */
 const CLIENTS = ["OpTic Gaming", "FaZe Clan", "Atlanta FaZe", "Miami Dolphins"];
