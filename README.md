@@ -38,6 +38,8 @@ const portfolio = {
 
 ---
 
+<div align="center">
+
 ## 🎭 THE EXPERIENCE
 
 <table>
@@ -62,8 +64,6 @@ const portfolio = {
 
 <br>
 
-<div align="center">
-
 ```
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃                                                    ┃
@@ -78,13 +78,13 @@ const portfolio = {
 
 ---
 
+<div align="center">
+
 ## 🔧 TECH ARSENAL
 
 <p align="center">
   <img src="https://skillicons.dev/icons?i=nextjs,js,css,html,github,vercel" />
 </p>
-
-<div align="center">
 
 | Technology | Purpose | Proficiency |
 |:-----------|:--------|:------------|
@@ -94,11 +94,7 @@ const portfolio = {
 | **HTML5** | Semantic Structure | `████████████████████` 100% |
 | **GitHub Actions** | CI/CD Pipeline | `██████████████████░░` 90% |
 
-</div>
-
 <br>
-
-<div align="center">
 
 ### CODE COMPOSITION
 
@@ -113,9 +109,9 @@ PowerShell  ░░░░░░░░░░░░░░░░░░░░░░�
 
 ---
 
-## 🚀 QUICK LAUNCH
-
 <div align="center">
+
+## 🚀 QUICK LAUNCH
 
 ```bash
 # 1. CLONE THE MAGIC
@@ -134,17 +130,15 @@ npm run dev
 # → http://localhost:3000
 ```
 
-</div>
-
 <br>
-
-<div align="center">
 
 **REQUIREMENTS:** Node.js `≥ 14.0.0` · npm `≥ 6.0.0`
 
 </div>
 
 ---
+
+<div align="center">
 
 ## 📂 ARCHITECTURE
 
@@ -174,15 +168,15 @@ Portfolio/
 └─ 📖 <b>README.md</b>              → You are here
 </pre>
 
----
+</div>
 
-## ✨ RECENT EVOLUTION
+---
 
 <div align="center">
 
-### `v1.0` — THE GENESIS
+## ✨ RECENT EVOLUTION
 
-</div>
+### `v1.0` — THE GENESIS
 
 ```diff
 + ✨ NEW: About page with immersive storytelling
@@ -209,11 +203,13 @@ Portfolio/
 
 </details>
 
+</div>
+
 ---
 
-## 🌐 DEPLOYMENT
-
 <div align="center">
+
+## 🌐 DEPLOYMENT
 
 ### POWERED BY GITHUB PAGES
 
@@ -235,8 +231,6 @@ Portfolio/
          └─────────────┘
 ```
 
-</div>
-
 <table align="center">
 <tr>
 <td align="center"><b>🚀 Total Deployments</b><br>18+</td>
@@ -246,17 +240,15 @@ Portfolio/
 </tr>
 </table>
 
-<div align="center">
-
 **ENVIRONMENTS:** `Production` · `Preview` · `GitHub Pages`
 
 </div>
 
 ---
 
-## 🎯 PROJECT METRICS
-
 <div align="center">
+
+## 🎯 PROJECT METRICS
 
 <table>
 <tr>
@@ -287,13 +279,11 @@ Portfolio/
 
 ---
 
-## 🤝 CONTRIBUTE
-
 <div align="center">
 
-Want to make this even better? Here's how:
+## 🤝 CONTRIBUTE
 
-</div>
+Want to make this even better? Here's how:
 
 ```bash
 # 1. Fork this repository
@@ -309,17 +299,15 @@ git push origin feature/something-amazing
 # 5. Open a Pull Request
 ```
 
-<div align="center">
-
 **All contributions are welcome!** From bug fixes to new features.
 
 </div>
 
 ---
 
-## 📞 LET'S CONNECT
-
 <div align="center">
+
+## 📞 LET'S CONNECT
 
 <br>
 
