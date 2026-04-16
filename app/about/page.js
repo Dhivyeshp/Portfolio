@@ -58,17 +58,6 @@ function LiveClock() {
   return <>{time}</>;
 }
 
-// Animated equalizer bars
-function Equalizer() {
-  return (
-    <div className="ap-eq">
-      {[0,1,2,3].map((i) => (
-        <div key={i} className="ap-eq-bar" style={{ animationDelay: `${i * 0.15}s` }} />
-      ))}
-    </div>
-  );
-}
-
 export default function AboutPage() {
   return (
     <div className="ap-root">
@@ -79,11 +68,17 @@ export default function AboutPage() {
         <span className="ap-brand">Dhivyesh Prithiviraj</span>
       </nav>
 
+      <div className="ap-topline">
+        <span>Dhivyesh</span>
+        <span>About Page</span>
+        <span>Dallas, Texas</span>
+      </div>
+
       {/* ── Bento ── */}
       <div className="ap-bento">
 
         {/* ── Photo ── */}
-        <div className="ap-card ap-card--photo" style={{ "--ap-delay": "0ms" }}>
+        <div className="ap-card ap-card--photo ap-card--sky" style={{ "--ap-delay": "0ms" }}>
           <div className="ap-photo-label">From Dallas, TX.</div>
           <img src="/images/headshot.JPG" alt="Dhivyesh Prithiviraj" className="ap-card-photo" />
           <div className="ap-photo-clock">
@@ -93,20 +88,27 @@ export default function AboutPage() {
         </div>
 
         {/* ── Me in brief ── */}
-        <div className="ap-card ap-card--brief" style={{ "--ap-delay": "70ms" }}>
-          <h2 className="ap-brief-heading">Me in brief</h2>
+        <div className="ap-card ap-card--brief ap-card--paper" style={{ "--ap-delay": "70ms" }}>
+          <div className="ap-brief-top">
+            <p className="ap-card-tag">Computer Engineer / Designer</p>
+            <div className="ap-brief-swatches">
+              <span />
+              <span />
+            </div>
+          </div>
+          <h2 className="ap-brief-heading">Dhivyesh brings software, systems, and design into one lane.</h2>
           <p className="ap-brief-body">
-            I'm a Computer Engineering student at UT Dallas who builds things that feel intentional —
-            software systems, production apps, and brand experiences for companies people actually know.
+            I build products that feel sharp in both function and presentation — from engineering-heavy apps
+            to brand systems and interactive experiences that people actually remember.
           </p>
           <p className="ap-brief-body">
-            I run Sprout Designs — branding for OpTic Gaming, FaZe Clan, Atlanta FaZe, and the
-            Miami Dolphins. Marketing Lead at HackUTD. UT Dallas Formula Racing.
+            Right now that spans Sprout Designs, HackUTD, and UT Dallas Formula Racing — mixing product thinking,
+            implementation, and visual direction across every project I touch.
           </p>
         </div>
 
         {/* ── Status ── */}
-        <div className="ap-card ap-card--status" style={{ "--ap-delay": "140ms" }}>
+        <div className="ap-card ap-card--status ap-card--paper" style={{ "--ap-delay": "140ms" }}>
           <p className="ap-card-tag">Status</p>
           <div className="ap-status-row">
             <span className="ap-status-dot" />
@@ -116,7 +118,7 @@ export default function AboutPage() {
         </div>
 
         {/* ── Education ── */}
-        <div className="ap-card ap-card--edu" style={{ "--ap-delay": "210ms" }}>
+        <div className="ap-card ap-card--edu ap-card--paper" style={{ "--ap-delay": "210ms" }}>
           <p className="ap-card-tag">Education</p>
           <p className="ap-edu-school">UT Dallas</p>
           <p className="ap-edu-degree">B.S. Computer Engineering</p>
@@ -124,17 +126,13 @@ export default function AboutPage() {
         </div>
 
         {/* ── Now Playing ── */}
-        <div className="ap-card ap-card--music" style={{ "--ap-delay": "280ms" }}>
+        <div className="ap-card ap-card--music ap-card--ink" style={{ "--ap-delay": "280ms" }}>
           <p className="ap-card-tag">Now playing</p>
           <div className="ap-music-inner">
             <div className="ap-music-cover">
-              <div className="ap-music-orbit">
-                <span className="ap-music-orbit-dot" />
-              </div>
               <div className="ap-music-vinyl" />
             </div>
             <div className="ap-music-info">
-              <Equalizer />
               <p className="ap-music-artist">{NOW_PLAYING.artist}</p>
               <p className="ap-music-song">{NOW_PLAYING.song}</p>
               <div className="ap-music-bar">
@@ -149,10 +147,12 @@ export default function AboutPage() {
         </div>
 
         {/* ── Tools I love ── */}
-        <div className="ap-card ap-card--tools" style={{ "--ap-delay": "350ms" }}>
-          <p className="ap-brief-heading ap-tools-heading">
-            Tools I love <sup className="ap-brief-sup">({skills.length})</sup>
-          </p>
+        <div className="ap-card ap-card--tools ap-card--sky" style={{ "--ap-delay": "350ms" }}>
+          <div className="ap-tools-head">
+            <p className="ap-card-tag">Toolkit</p>
+            <p className="ap-tools-caption">Design, code, motion, and systems.</p>
+          </div>
+          <p className="ap-brief-heading ap-tools-heading">Tools I keep close <sup className="ap-brief-sup">({skills.length})</sup></p>
           <div className="ap-tools-grid">
             {skills.map((t) => (
               <div className="ap-tool-item" key={t.name}>
@@ -166,7 +166,7 @@ export default function AboutPage() {
         </div>
 
         {/* ── Fav things ── */}
-        <div className="ap-card ap-card--fav" style={{ "--ap-delay": "420ms" }}>
+        <div className="ap-card ap-card--fav ap-card--paper" style={{ "--ap-delay": "420ms" }}>
           <p className="ap-card-tag">Things I love</p>
           <div className="ap-fav-list">
             {favThings.map((f) => (
@@ -179,7 +179,7 @@ export default function AboutPage() {
         </div>
 
         {/* ── Connect ── */}
-        <div className="ap-card ap-card--connect" style={{ "--ap-delay": "490ms" }}>
+        <div className="ap-card ap-card--connect ap-card--sky" style={{ "--ap-delay": "490ms" }}>
           <p className="ap-card-tag">Connect</p>
           <div className="ap-connect-links">
             <a href="https://github.com/dhivyeshp" target="_blank" rel="noreferrer" className="ap-connect-link">GitHub ↗</a>

@@ -78,7 +78,9 @@ const DISPLAY = `#version 300 es
 precision highp float;
 in vec2 v_uv;
 uniform sampler2D u_dye;
+uniform vec2 u_px;
 uniform float u_alpha_scale, u_alpha_max;
+uniform float u_time, u_glass_mix;
 out vec4 o;
 
 vec3 hueShift(vec3 col, float h) {
@@ -87,15 +89,70 @@ vec3 hueShift(vec3 col, float h) {
   return col*c + cross(k,col)*s + k*dot(k,col)*(1.0-c);
 }
 
+vec3 sampleSoft(vec2 uv) {
+  vec2 px = u_px;
+  vec3 c = texture(u_dye, uv).rgb * 0.28;
+  c += texture(u_dye, uv + vec2(px.x, 0.0)).rgb * 0.16;
+  c += texture(u_dye, uv - vec2(px.x, 0.0)).rgb * 0.16;
+  c += texture(u_dye, uv + vec2(0.0, px.y)).rgb * 0.16;
+  c += texture(u_dye, uv - vec2(0.0, px.y)).rgb * 0.16;
+  c += texture(u_dye, uv + px).rgb * 0.04;
+  c += texture(u_dye, uv - px).rgb * 0.04;
+  c += texture(u_dye, uv + vec2(px.x, -px.y)).rgb * 0.04;
+  c += texture(u_dye, uv + vec2(-px.x, px.y)).rgb * 0.04;
+  return c;
+}
+
+float sampleField(vec2 uv) {
+  vec3 c = sampleSoft(uv);
+  return max(c.r, max(c.g, c.b));
+}
+
 void main(){
-  vec3 c = texture(u_dye, v_uv).rgb;
+  vec3 c = sampleSoft(v_uv);
   float intensity = max(c.r, max(c.g, c.b));
-  vec3 col = intensity > 0.001 ? c / intensity : vec3(0.0);
-  // Iridescent: shift hue based on position + local intensity (oil-slick / soap-bubble)
-  float shift = v_uv.x * 3.14159 * 2.0 + v_uv.y * 2.7 + intensity * 5.0;
-  col = hueShift(col, shift);
-  float a = smoothstep(0.04, 0.30, intensity);
-  a = a * u_alpha_scale;
+  float fx1 = sampleField(v_uv + vec2(u_px.x * 2.0, 0.0));
+  float fx2 = sampleField(v_uv - vec2(u_px.x * 2.0, 0.0));
+  float fy1 = sampleField(v_uv + vec2(0.0, u_px.y * 2.0));
+  float fy2 = sampleField(v_uv - vec2(0.0, u_px.y * 2.0));
+  vec2 grad = vec2(fx1 - fx2, fy1 - fy2);
+  float edge = length(grad);
+  vec2 dir = edge > 0.0 ? normalize(grad) : vec2(0.0);
+  vec2 fringeOffset = dir * (0.006 + edge * 0.12);
+
+  float r = sampleField(v_uv + fringeOffset + vec2(u_px.x * 1.5, 0.0));
+  float g = sampleField(v_uv);
+  float b = sampleField(v_uv - fringeOffset - vec2(u_px.x * 1.5, 0.0));
+  vec3 spectral =
+    r * vec3(0.78, 0.92, 1.00) +
+    g * vec3(1.00, 0.78, 0.95) +
+    b * vec3(0.84, 0.80, 1.00);
+  spectral = spectral / max(max(spectral.r, spectral.g), max(spectral.b, 0.0001));
+
+  float radial = length(v_uv - vec2(0.5));
+  float shift = radial * 7.0 + v_uv.x * 3.4 - v_uv.y * 2.8 + u_time * 0.1;
+  spectral = hueShift(spectral, shift * 0.14);
+
+  vec3 pearlA = vec3(0.76, 0.93, 1.00);
+  vec3 pearlB = vec3(1.00, 0.68, 0.95);
+  vec3 pearlC = vec3(0.88, 0.80, 1.00);
+  float pearlMix = 0.5 + 0.5 * sin(radial * 26.0 - u_time * 0.26);
+  vec3 pearl = mix(mix(pearlA, pearlB, pearlMix), pearlC, 0.35);
+
+  vec3 candy = vec3(1.00, 0.72, 0.95);
+  vec3 aqua = vec3(0.74, 0.92, 1.00);
+  vec3 lilac = vec3(0.86, 0.78, 1.00);
+  float tintWave = 0.5 + 0.5 * sin(v_uv.x * 12.0 - v_uv.y * 7.0 + u_time * 0.24);
+  vec3 foil = mix(mix(aqua, candy, tintWave), lilac, 0.28 + edge * 1.2);
+
+  vec3 col = mix(foil, spectral, 0.5 + edge * 2.8);
+  col = mix(col, pearl, 0.34);
+  col *= mix(0.48, 0.4, u_glass_mix);
+
+  float body = smoothstep(0.008, 0.06, intensity) * 0.32;
+  float rim = smoothstep(0.0015, 0.032, edge);
+  float a = max(body, rim * 0.95);
+  a = pow(a, 1.1) * u_alpha_scale;
   a = clamp(a, 0.0, u_alpha_max);
   o = vec4(col, a);
 }`;
@@ -178,8 +235,8 @@ export default function FluidSim({ glass = false }) {
       gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
     };
 
-    /* SIM low for perf (velocity/pressure), DYE mid for visual quality */
-    const SIM = 64, DYE = 256;
+    /* Keep the sim light but soft enough for glassy refraction. */
+    const SIM = 80, DYE = 288;
     const velocity = ping(gl, SIM, SIM);
     const pressure = ping(gl, SIM, SIM);
     const dye      = ping(gl, DYE, DYE);
@@ -203,17 +260,17 @@ export default function FluidSim({ glass = false }) {
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
 
-    /* mouse — iridescent hue cycles through blue→purple→pink range */
-    let mx=.5, my=.5, pmx=.5, pmy=.5, hue=0, hasMoved=false;
+    /* Pointer smoothing keeps the motion airy instead of twitchy. */
+    let tx=.5, ty=.5, mx=.5, my=.5, pmx=.5, pmy=.5, hue=0, hasMoved=false;
 
     const splat = (x, y, dvx, dvy, r, g, b) => {
       const asp = canvas.width / canvas.height;
-      const R = 0.00035; // thin ink line
+      const R = glass ? 0.00135 : 0.00105;
       pass(pSplat, velocity.write.f, SIM, SIM, () => {
         bind(gl,0,velocity.read.t); gl.uniform1i(u(gl,pSplat,"u_tgt"),0);
         gl.uniform3f(u(gl,pSplat,"color"), dvx, dvy, 0);
         gl.uniform2f(u(gl,pSplat,"point"), x, y);
-        gl.uniform1f(u(gl,pSplat,"radius"), R * 2.5);
+        gl.uniform1f(u(gl,pSplat,"radius"), R * 2.7);
         gl.uniform1f(u(gl,pSplat,"aspect"), asp);
       });
       velocity.swap();
@@ -229,12 +286,11 @@ export default function FluidSim({ glass = false }) {
 
     const onMove = (e) => {
       const rect = canvas.getBoundingClientRect();
-      pmx = mx; pmy = my;
-      mx  = (e.clientX - rect.left) / rect.width;
-      my  = 1 - (e.clientY - rect.top) / rect.height;
+      tx  = (e.clientX - rect.left) / rect.width;
+      ty  = 1 - (e.clientY - rect.top) / rect.height;
       hasMoved = true;
     };
-    window.addEventListener("mousemove", onMove, { passive: true });
+    window.addEventListener("pointermove", onMove, { passive: true });
 
     const DT = 0.016;
     let raf;
@@ -243,22 +299,25 @@ export default function FluidSim({ glass = false }) {
       raf = requestAnimationFrame(tick);
       const ts = [1/SIM, 1/SIM];
 
-      if (hasMoved) {
-        /* Calmer force — feels fluid not explosive */
-        const dvx = (mx - pmx) * 80;
-        const dvy = (my - pmy) * 80;
+      pmx = mx;
+      pmy = my;
+      mx += (tx - mx) * 0.34;
+      my += (ty - my) * 0.34;
+
+      if (hasMoved || Math.abs(mx - pmx) + Math.abs(my - pmy) > 0.00008) {
+        /* Faster flash in, faster falloff. */
+        const dvx = (mx - pmx) * 108;
+        const dvy = (my - pmy) * 108;
         if (glass) {
-          /* Glass: full-spectrum iridescent shimmer on dark bg */
-          hue = (hue + Math.hypot(dvx, dvy) * 0.08) % 1.0;
-          const [r, g, b] = hsl(hue, 0.85, 0.70);
+          hue = (hue + Math.hypot(dvx, dvy) * 0.09) % 1.0;
+          const [r, g, b] = hsl(0.56 + hue * 0.12, 0.46, 0.82);
           splat(mx, my, dvx, dvy, r, g, b);
         } else {
-          /* Full-spectrum iridescent: cycles all hues, high saturation */
-          hue = (hue + Math.hypot(dvx, dvy) * 0.18) % 1.0;
-          const [r, g, b] = hsl(hue, 0.95, 0.58);
+          hue = (hue + Math.hypot(dvx, dvy) * 0.12) % 1.0;
+          const [r, g, b] = hsl(0.57 + hue * 0.16, 0.54, 0.82);
           splat(mx, my, dvx, dvy, r, g, b);
         }
-        hasMoved = false;
+        hasMoved = Math.abs(tx - mx) + Math.abs(ty - my) > 0.0009;
       }
 
       /* velocity advect */
@@ -266,8 +325,7 @@ export default function FluidSim({ glass = false }) {
         bind(gl,0,velocity.read.t); bind(gl,1,velocity.read.t);
         gl.uniform1i(u(gl,pAdvect,"u_vel"),0); gl.uniform1i(u(gl,pAdvect,"u_src"),1);
         gl.uniform2fv(u(gl,pAdvect,"u_tex"),ts);
-        /* Higher dissipation = velocity fades quicker, less frantic */
-        gl.uniform1f(u(gl,pAdvect,"dt"),DT); gl.uniform1f(u(gl,pAdvect,"diss"),.886);
+        gl.uniform1f(u(gl,pAdvect,"dt"),DT); gl.uniform1f(u(gl,pAdvect,"diss"),.87);
       }); velocity.swap();
 
       /* divergence */
@@ -297,7 +355,7 @@ export default function FluidSim({ glass = false }) {
         bind(gl,0,velocity.read.t); bind(gl,1,dye.read.t);
         gl.uniform1i(u(gl,pAdvect,"u_vel"),0); gl.uniform1i(u(gl,pAdvect,"u_src"),1);
         gl.uniform2fv(u(gl,pAdvect,"u_tex"),[1/DYE,1/DYE]);
-        gl.uniform1f(u(gl,pAdvect,"dt"),DT); gl.uniform1f(u(gl,pAdvect,"diss"),.974);
+        gl.uniform1f(u(gl,pAdvect,"dt"),DT); gl.uniform1f(u(gl,pAdvect,"diss"),.91);
       }); dye.swap();
 
       /* render to screen */
@@ -310,9 +368,11 @@ export default function FluidSim({ glass = false }) {
       bindQuad(pDisplay);
       bind(gl,0,dye.read.t);
       gl.uniform1i(u(gl,pDisplay,"u_dye"),0);
-      // glass: bright shimmer on dark — low max alpha; iridescent: vivid ink on white
-      gl.uniform1f(u(gl,pDisplay,"u_alpha_scale"), glass ? 0.40 : 0.78);
-      gl.uniform1f(u(gl,pDisplay,"u_alpha_max"),   glass ? 0.40 : 0.78);
+      gl.uniform2f(u(gl,pDisplay,"u_px"), 1 / DYE, 1 / DYE);
+      gl.uniform1f(u(gl,pDisplay,"u_time"), performance.now() * 0.001);
+      gl.uniform1f(u(gl,pDisplay,"u_glass_mix"), glass ? 1.0 : 0.0);
+      gl.uniform1f(u(gl,pDisplay,"u_alpha_scale"), glass ? 0.14 : 0.2);
+      gl.uniform1f(u(gl,pDisplay,"u_alpha_max"),   glass ? 0.16 : 0.22);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     };
 
@@ -320,7 +380,7 @@ export default function FluidSim({ glass = false }) {
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("pointermove", onMove);
       ro.disconnect();
     };
   }, []);
