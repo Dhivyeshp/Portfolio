@@ -27,13 +27,6 @@ const stats = [
 
 const experience = [
   {
-    company: "Fannie Mae",
-    role: "Incoming Software Engineering Intern",
-    date: "Jun 2026 — Aug 2026",
-    location: "Dallas, TX",
-    points: [],
-  },
-  {
     company: "NRVE",
     role: "Software Engineering Intern",
     date: "Jun 2025 — Aug 2025",
@@ -322,7 +315,6 @@ function lerpColor(a, b, t) {
 // Experience accent colors
 const EXP_BASE   = [235, 235, 235];
 const EXP_ACCENT = [
-  [195, 185, 220], // Fannie Mae — soft lavender
   [168, 212, 188], // NRVE — soft green
   [168, 184, 216], // ACM — soft blue
   [175, 205, 215], // UTD Research — cool teal
