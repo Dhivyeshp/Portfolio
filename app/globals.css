@@ -952,11 +952,14 @@ button { color: inherit; background: none; border: none; padding: 0; cursor: poi
 /* ── Footer ─────────────────────────────────────────── */
 
 .site-footer {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   padding: 24px 0 40px;
   border-top: 1px solid var(--gray-3);
+}
+.site-footer > *:last-child {
+  justify-self: end;
 }
 .site-footer span {
   font-family: var(--font-mono, monospace);
