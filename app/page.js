@@ -1069,6 +1069,13 @@ export default function Page() {
 
 <footer className="site-footer">
           <span>Dhivyesh Prithiviraj — {new Date().getFullYear()}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <a href="https://ecs.utdring.com/#dhivyesh.com?nav=prev" style={{ color: "inherit", textDecoration: "none" }}>←</a>
+            <a href="https://ecs.utdring.com/#dhivyesh.com" target="_blank" rel="noreferrer">
+              <img src="https://ecs.utdring.com/icon.white.svg" alt="ECS Webring" style={{ width: "28px", height: "auto", opacity: 0.6 }} />
+            </a>
+            <a href="https://ecs.utdring.com/#dhivyesh.com?nav=next" style={{ color: "inherit", textDecoration: "none" }}>→</a>
+          </div>
           <span>Dallas, TX</span>
         </footer>
 
