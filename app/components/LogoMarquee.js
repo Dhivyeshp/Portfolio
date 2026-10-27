@@ -6,7 +6,7 @@ const LOGOS = [
   "/images/logos/Atlanta_FaZe_logo.png",
   "/images/logos/nyxl.png",
   "/images/logos/miami dophins.png",
-  "/images/logos/Fannie-Mae-Logo.png",
+  "/images/logos/ibm.png",
   "/images/logos/nrve.png",
   "/images/logos/hackutd.png",
   "/images/logos/acm utd.webp",

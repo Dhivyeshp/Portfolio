@@ -27,6 +27,17 @@ const stats = [
 
 const experience = [
   {
+    company: "IBM (watsonx.ai Data Refinery)",
+    role: "Software Development Engineer Intern",
+    date: "Jun 2026 — Aug 2026",
+    location: "Austin, TX",
+    points: [
+      "Built a Python synthetic monitoring engine on the Instana API that runs checks concurrently across 12 global environments, catching failures before customers hit them.",
+      "Built a SQL-backed telemetry dashboard that tracks reliability trends and flags drift across environments.",
+      "Automated alerting into Slack and auto-filed GitHub issues; demoed results to leadership.",
+    ],
+  },
+  {
     company: "NRVE",
     role: "Software Engineering Intern",
     date: "Jun 2025 — Aug 2025",
@@ -82,6 +93,24 @@ const philosophy = [
 ];
 
 const projects = [
+  {
+    code: "HST-008", year: "2026",
+    title: "HackStash", category: "Hardware + Game · Heist Simulator",
+    award: "Rowdy Hacks XII · Overall Track 3rd Place · MLH Best Use of Presage",
+    summary: "Getaway game across downtown San Antonio where each heist needs a real-world action: fool a face scanner, crack a physical Arduino vault, and talk an AI bank agent into a one-time code over the phone.",
+    stack: ["React", "Three.js", "MediaPipe", "Python", "Flask", "Socket.IO", "Arduino", "Raspberry Pi", "ElevenLabs", "Twilio", "Presage"],
+    github: "https://github.com/veermshah/rowdyhacks",
+    accent: "rgba(235, 120, 120, 0.35)",
+  },
+  {
+    code: "DST-009", year: "2026",
+    title: "Destina", category: "Robotics · AI Party Game",
+    award: "HackTX 2026 · Meta Track 3rd Place: Bringing People Closer Together with AI",
+    summary: "Tabletop icebreaker game hosted by Tina, a Raspberry Pi robot. Muse Spark suggests challenges, a Vision Pro Game Master picks and drives, NFC stars deliver them, and a custom Solana program tracks rewards.",
+    stack: ["React", "TypeScript", "Express", "Swift", "visionOS", "Raspberry Pi", "ESP32", "Solana", "Anchor", "Muse Spark"],
+    github: "https://github.com/Dhivyeshp/hacktx_26",
+    accent: "rgba(150, 215, 200, 0.35)",
+  },
   {
     code: "RCE-001", year: "2025",
     title: "R.A.C.E.", category: "Telemetry + AI Tooling",
@@ -315,6 +344,7 @@ function lerpColor(a, b, t) {
 // Experience accent colors
 const EXP_BASE   = [235, 235, 235];
 const EXP_ACCENT = [
+  [160, 190, 235], // IBM — IBM blue
   [168, 212, 188], // NRVE — soft green
   [168, 184, 216], // ACM — soft blue
   [175, 205, 215], // UTD Research — cool teal
@@ -324,6 +354,8 @@ const EXP_ACCENT = [
 // Work card accent colors (parallel to projects array)
 const WORK_BASE   = [235, 235, 235];
 const WORK_ACCENT = [
+  [235, 120, 120], // HackStash — heist red
+  [150, 215, 200], // Destina — mint
   [232, 168,  94], // R.A.C.E. — warm amber
   [130, 210, 170], // Vertera — soft green
   [120, 175, 235], // SeatSwap — soft blue
@@ -1008,6 +1040,7 @@ export default function Page() {
                   </div>
                   <h3 className="work-h3">{p.title}</h3>
                   <p className="work-category">{p.category}</p>
+                  {p.award && <p className="work-award">🏆 {p.award}</p>}
                   <p className="work-desc">{p.summary}</p>
                   <div className="work-stack">
                     {p.stack.map((t) => <span className="work-stack-item" key={t}>{t}</span>)}
